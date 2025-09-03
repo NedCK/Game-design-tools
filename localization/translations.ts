@@ -1,0 +1,314 @@
+
+
+export const translations = {
+  en: {
+    initialTimeline: ['Enter App', 'Transition', 'Start Game'],
+    header: {
+      title: 'AI Game Requirement Architect',
+      settings: 'Settings',
+    },
+    toolbar: {
+      addStep: 'Add Timeline Step',
+      export: 'Export',
+      exportCSV: 'Export as CSV (for Excel)',
+      exportMD: 'Export as Markdown',
+      saveProject: 'Save Project',
+      loadProject: 'Load Project',
+    },
+    table: {
+      headerCorner: 'Category ↓ / Timeline →',
+      category: 'Category',
+      reqIdRule: 'Req. ID Rule: [PREFIX]-[###]',
+      coreExperience: 'Core Experience',
+      placeholders: {
+        description: 'Enter description...',
+        coreExperience: 'Describe experience...',
+        image: 'Select to generate an image',
+        prompt: 'Enter image prompt...',
+        techGenDisabled: 'Fill in shot details above to enable generation.',
+        techGenEnabled: 'Generate Tech Implementation with AI',
+      },
+      storyboard: {
+        id: 'Storyboard ID',
+        shotTime: 'Shot Time',
+        sceneDescription: 'Scene Description / Camera',
+        playerStatus: 'Player Status',
+        techImplementation: 'Tech Implementation',
+        sketch: 'Sketch',
+      }
+    },
+    aiPanel: {
+      title: 'AI Assistant',
+      generateTitle: '1. Generate Requirements',
+      generatePlaceholder: 'Select a timeline header, then describe the step here (e.g., "Player enters the main menu and sees options to start or quit").',
+      generateButton: 'Generate Requirements',
+      refineTitle: '2. Refine or Translate Cell',
+      refinePlaceholder: 'Select a cell to edit its content. Use the buttons below for AI actions.',
+      refineButton: 'Refine with AI',
+      translateButton: 'Translate to Chinese',
+      imageGenerationTitle: '2. Generate Storyboard Image',
+      imageGenerationPlaceholder: 'Select a storyboard cell, then describe the scene to generate an image.',
+      imageGenerationButton: 'Generate Image',
+      gameConceptTitle: '3. Game Concept Design',
+      gameConceptPlaceholder: 'Describe the overall art style, mood, key characters, and setting of your game here. This will guide the AI in generating consistent storyboard images.',
+      consolidateTitle: '4. Consolidate UI System',
+      consolidateButton: 'Consolidate UI Requirements',
+      alignTitle: '5. Align Column to Core Experience',
+      alignDescription: 'Get AI suggestions to align all requirements in the {stepName} column with its core experience.',
+      alignButton: 'Get Alignment Suggestions',
+      resultsTitle: '6. AI Suggestions',
+      resultsPlaceholder: 'Suggestions from the AI will appear here.',
+    },
+    settings: {
+      title: 'Settings',
+      provider: 'AI Provider',
+      apiKeyFor: 'API Key for {provider}',
+      apiKeyPlaceholder: 'Enter your API key',
+      helpText: 'Your API key is stored locally in your browser and never sent to our servers.',
+      gameEngine: 'Game Engine',
+      cancel: 'Cancel',
+      save: 'Save',
+      viewUserGuide: 'View User Guide v1.0',
+      hideUserGuide: 'Hide User Guide',
+      userGuide: {
+        title: 'User Guide (v1.0)',
+        intro: {
+          title: 'Introduction',
+          content: 'Welcome to the AI Game Requirement Architect! This tool is designed to streamline the game design process by integrating AI to help you generate, refine, and manage your game requirement documents from a producer\'s perspective.'
+        },
+        gettingStarted: {
+          title: '1. Getting Started',
+          apiKey: '**Set API Key & Engine:** Click the settings icon to enter your AI provider API key (e.g., Google Gemini) and select your target game engine. This is essential for all AI functions.',
+          addStep: '**Add Timeline Steps:** Use the "+ Add Timeline Step" button to expand your game\'s flow.',
+          editCells: '**Edit Content:** Click on any cell in the table to start typing. Your work is auto-saved locally.'
+        },
+        coreFeatures: {
+          title: '2. Core AI Features',
+          generateColumn: '**Generate Column Requirements:** Select a timeline header (e.g., "Start Game"). Describe the events of that step in the AI Assistant panel on the right, and click "Generate Requirements" to have the AI populate the entire column with initial ideas.',
+          refineCell: '**Refine & Translate:** Select any individual requirement cell. The AI Assistant will show its content. You can then use the "Refine with AI" button to expand on the idea or "Translate" to convert it to Chinese.',
+          consolidateUI: '**Consolidate UI System:** After generating requirements for a column, select that same timeline header again and click "Consolidate UI Requirements". The AI will read all the requirements in that column and create a specific to-do list for the UI/UX team in the "UI System" row.',
+          generateStoryboard: '**Generate Storyboard:** In the "Game Storyboard" row, you can detail a specific scene. Use the AI Assistant to enter a prompt in the "Generate Storyboard Image" section and click the button to create a visual sketch. You can also fill in details like "Shot Time" and then click the sparkle icon in the cell to have the AI generate a technical implementation plan.',
+          alignExperience: '**Align to Core Experience (Key Feature):** This is the most powerful feature. First, fill in the "Core Experience" row for a specific timeline step, describing the emotion or feeling you want the player to have (e.g., "A sense of wonder and discovery"). Then, select that Core Experience cell. In the AI Assistant, a new option will appear. Click "Get Alignment Suggestions" to receive detailed feedback on how to adjust the Narrative, Art, Interaction, Audio, and Storyboard descriptions in that column to better achieve your desired core experience.'
+        },
+        projectManagement: {
+          title: '3. Project Management',
+          saveLoad: '**Save/Load Project:** Use the "Save Project" and "Load Project" buttons to save your entire table to a local file (.json) and load it back in later. This is different from the automatic local browser storage.',
+          export: '**Export:** Use the "Export" button to save your table in user-friendly formats like CSV (for spreadsheets) or Markdown (for documents).'
+        }
+      }
+    },
+    notifications: {
+      apiKeyNotSet: 'API Key not set for the selected provider.',
+      generationFailed: 'AI Generation Failed: {error}',
+      columnGenerated: 'Column requirements generated successfully!',
+      columnGenerationFailed: 'AI Column Generation Failed: {error}',
+      uiConsolidated: 'UI System requirements consolidated successfully!',
+      uiConsolidationFailed: 'AI UI Consolidation Failed: {error}',
+      suggestionsReceived: 'Suggestions received!',
+      suggestionFailed: 'AI Suggestion Failed: {error}',
+      exportedCSV: 'Exported to CSV!',
+      exportedMD: 'Exported to Markdown!',
+      loadFailed: 'Failed to load saved data from local storage.',
+      saveFailed: 'Failed to save data to local storage.',
+      selectCellToRefine: 'Please select a requirement cell before using this feature.',
+      selectImageCell: 'Please select a storyboard cell to generate an image.',
+      cellRefined: 'Cell content successfully refined!',
+      translationSuccess: 'Content translated successfully!',
+      translationFailed: 'AI Translation Failed: {error}',
+      imageGenerated: 'Storyboard image generated successfully!',
+      imageGenerationFailed: 'AI Image Generation Failed: {error}',
+      storyboardInfoMissing: 'Please fill in Shot Time, Scene Description, or Player Status before generating.',
+      techImplementationGenerated: 'Technical implementation generated successfully!',
+      techImplementationFailed: 'AI Tech Implementation Generation Failed: {error}',
+      projectSaved: 'Project saved to file successfully!',
+      projectSaveFailed: 'Failed to save project to file.',
+      projectLoaded: 'Project loaded from file successfully!',
+      projectLoadFailed: 'Failed to load project file. It might be corrupt or in the wrong format.',
+    },
+    categories: {
+      STORY: {
+        name: 'Narrative/Story',
+        description: 'Story beats, character arcs, dialogue, and lore.',
+      },
+      ART: {
+        name: 'Visual/Art',
+        description: 'Visual style, assets, animations, UI/UX design.',
+      },
+      INTERACTION: {
+        name: 'Interaction',
+        description: 'Player controls, mechanics, feedback systems.',
+      },
+      SYSTEM: {
+        name: 'System Logic',
+        description: 'Game rules, state management, backend logic.',
+      },
+      AUDIO: {
+        name: 'Music/Audio',
+        description: 'Soundtrack, sound effects, voiceovers.',
+      },
+      UI_SYSTEM: {
+        name: 'UI System',
+        description: 'Aggregated UI elements, layouts, and user flows.',
+      },
+      STORYBOARD: {
+        name: 'Game Storyboard',
+        description: 'AI-generated visual storyboards for key scenes.',
+      },
+    }
+  },
+  zh: {
+    initialTimeline: ['进入软件', '过渡', '开始游戏'],
+    header: {
+      title: 'AI 游戏需求架构师',
+      settings: '设置',
+    },
+    toolbar: {
+      addStep: '添加时间线步骤',
+      export: '导出',
+      exportCSV: '导出为 CSV (用于 Excel)',
+      exportMD: '导出为 Markdown',
+      saveProject: '保存项目',
+      loadProject: '加载项目',
+    },
+    table: {
+      headerCorner: '分类 ↓ / 时间轴 →',
+      category: '类别',
+      reqIdRule: '需求 ID 规则：[前缀]-[###]',
+      coreExperience: '核心体验',
+      placeholders: {
+        description: '输入描述...',
+        coreExperience: '描述体验...',
+        image: '选择以生成图片',
+        prompt: '输入图片提示词...',
+        techGenDisabled: '请填写以上镜头细节以启用生成功能。',
+        techGenEnabled: '使用 AI 生成技术实现',
+      },
+      storyboard: {
+        id: '分镜需求ID',
+        shotTime: '镜头时间',
+        sceneDescription: '画面描述/镜头语言',
+        playerStatus: '玩家状态',
+        techImplementation: '技术实现（工具/系统）',
+        sketch: '分镜草图',
+      }
+    },
+    aiPanel: {
+      title: 'AI 助手',
+      generateTitle: '1. 生成需求',
+      generatePlaceholder: '选择一个时间线标题，然后在此处描述该步骤（例如，“玩家进入主菜单并看到开始或退出的选项”）。',
+      generateButton: '生成需求',
+      refineTitle: '2. 优化或翻译单元格',
+      refinePlaceholder: '选择一个单元格以编辑其内容。使用下面的按钮执行 AI 操作。',
+      refineButton: '使用 AI 优化',
+      translateButton: '翻译成中文',
+      imageGenerationTitle: '2. 生成分镜图片',
+      imageGenerationPlaceholder: '选择一个分镜单元格，然后描述要生成的场景。',
+      imageGenerationButton: '生成图片',
+      gameConceptTitle: '3. 游戏概念设计',
+      gameConceptPlaceholder: '在此描述您游戏的整体美术风格、氛围、关键角色和设定。这将指导AI生成风格一致的分镜草图。',
+      consolidateTitle: '4. 整合UI系统',
+      consolidateButton: '整合UI需求',
+      alignTitle: '5. 使该列对齐核心体验',
+      alignDescription: '获取AI建议，以使 {stepName} 列中的所有需求与其核心体验保持一致。',
+      alignButton: '获取对齐建议',
+      resultsTitle: '6. AI 建议',
+      resultsPlaceholder: 'AI 的建议将显示在这里。',
+    },
+    settings: {
+      title: '设置',
+      provider: 'AI 提供商',
+      apiKeyFor: '{provider} 的 API 密钥',
+      apiKeyPlaceholder: '输入您的 API 密钥',
+      helpText: '您的 API 密钥存储在您本地的浏览器中，绝不会发送到我们的服务器。',
+      gameEngine: '游戏引擎',
+      cancel: '取消',
+      save: '保存',
+      viewUserGuide: '查看使用说明 (v1.0)',
+      hideUserGuide: '隐藏使用说明',
+      userGuide: {
+        title: '使用说明 (v1.0)',
+        intro: {
+          title: '引言',
+          content: '欢迎使用 AI 游戏需求架构师！本工具旨在通过集成 AI，从游戏制作人的角度帮助您生成、优化和管理游戏需求文档，从而简化游戏设计流程。'
+        },
+        gettingStarted: {
+          title: '1. 快速入门',
+          apiKey: '**设置API密钥和引擎：** 点击设置图标，输入您的 AI 服务商 API 密钥（例如 Google Gemini），并选择您的目标游戏引擎。这是所有 AI 功能正常运作的基础。',
+          addStep: '**添加时间线步骤：** 使用“+ 添加时间线步骤”按钮来扩展您的游戏流程。',
+          editCells: '**编辑内容：** 单击表格中的任何单元格即可开始输入。您的工作会自动保存在本地浏览器中。'
+        },
+        coreFeatures: {
+          title: '2. 核心 AI 功能',
+          generateColumn: '**生成整列需求：** 选择一个时间线标题（例如，“开始游戏”）。在右侧的 AI 助手面板中描述该步骤中发生的事件，然后点击“生成需求”，AI 将会为整个列填充初步的想法。',
+          refineCell: '**优化和翻译单元格：** 选择任何一个独立的需求单元格。AI 助手将显示其内容。然后您可以使用“使用 AI 优化”按钮来扩展想法，或使用“翻译”按钮将其转换为中文。',
+          consolidateUI: '**整合UI系统需求：** 为某一列生成需求后，再次选择该列的时间线标题，然后点击“整合UI需求”。AI 将读取该列中的所有需求，并在“UI系统”行中为 UI/UX 团队创建一个具体的待办事项列表。',
+          generateStoryboard: '**生成游戏分镜：** 在“游戏分镜”行中，您可以详细描述一个特定场景。在 AI 助手中，于“生成分镜图片”部分输入提示词，然后点击按钮即可创建一张视觉草图。您还可以填写“镜头时间”等细节，然后点击单元格内的小图标，让 AI 生成技术实现方案。',
+          alignExperience: '**对齐核心体验（核心功能）：** 这是最强大的功能。首先，为特定的时间线步骤填写“核心体验”行，描述您希望玩家拥有的情感或感觉（例如，“一种奇妙和发现的感觉”）。然后，选中那个核心体验单元格。在 AI 助手中会出现一个新选项，点击“获取对齐建议”，AI 会提供详细的反馈，告诉您如何调整该列中的叙事、美术、互动、音频和分镜描述，以更好地实现您期望的核心体验。'
+        },
+        projectManagement: {
+          title: '3. 项目管理',
+          saveLoad: '**保存/加载项目：** 使用“保存项目”和“加载项目”按钮，将您的整个表格保存到一个本地文件（.json）中，并在以后加载回来。这与自动的浏览器本地存储是不同的。',
+          export: '**导出：** 使用“导出”按钮，将您的表格保存为用户友好的格式，如 CSV（用于电子表格）或 Markdown（用于文档）。'
+        }
+      }
+    },
+    notifications: {
+      apiKeyNotSet: '未为所选提供商设置 API 密钥。',
+      generationFailed: 'AI 生成失败：{error}',
+      columnGenerated: '已成功生成列需求！',
+      columnGenerationFailed: 'AI 列生成失败：{error}',
+      uiConsolidated: 'UI系统需求整合成功！',
+      uiConsolidationFailed: 'AI UI整合失败：{error}',
+      suggestionsReceived: '已收到建议！',
+      suggestionFailed: 'AI 建议失败：{error}',
+      exportedCSV: '已导出为 CSV！',
+      exportedMD: '已导出为 Markdown！',
+      loadFailed: '从本地存储加载已保存的数据失败。',
+      saveFailed: '将数据保存到本地存储失败。',
+      selectCellToRefine: '请在使用此功能前选择一个需求单元格。',
+      selectImageCell: '请选择一个分镜单元格以生成图片。',
+      cellRefined: '单元格内容已成功优化！',
+      translationSuccess: '内容翻译成功！',
+      translationFailed: 'AI 翻译失败：{error}',
+      imageGenerated: '分镜图片生成成功！',
+      imageGenerationFailed: 'AI 图片生成失败：{error}',
+      storyboardInfoMissing: '请在生成前填写镜头时间、画面描述或玩家状态。',
+      techImplementationGenerated: '技术实现已成功生成！',
+      techImplementationFailed: 'AI 技术实现生成失败：{error}',
+      projectSaved: '项目已成功保存到文件！',
+      projectSaveFailed: '项目保存至文件失败。',
+      projectLoaded: '项目已成功从文件加载！',
+      projectLoadFailed: '加载项目文件失败。文件可能已损坏或格式不正确。',
+    },
+    categories: {
+      STORY: {
+        name: '叙事/故事',
+        description: '故事节奏、角色弧光、对话和传说。',
+      },
+      ART: {
+        name: '视觉/美术',
+        description: '视觉风格、资产、动画、UI/UX 设计。',
+      },
+      INTERACTION: {
+        name: '互动',
+        description: '玩家控制、机制、反馈系统。',
+      },
+      SYSTEM: {
+        name: '系统逻辑',
+        description: '游戏规则、状态管理、后端逻辑。',
+      },
+      AUDIO: {
+        name: '音乐/音效',
+        description: '配乐、音效、配音。',
+      },
+      UI_SYSTEM: {
+        name: '用户界面UI系统',
+        description: '汇总所有UI元素、布局和用户流程。',
+      },
+      STORYBOARD: {
+          name: '游戏分镜',
+          description: 'AI生成的关键场景视觉分镜。',
+      },
+    }
+  }
+};

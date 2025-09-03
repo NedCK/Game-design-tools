@@ -1,0 +1,5 @@
+{
+  "name": "AI Game Requirement Architect",
+  "description": "An AI-powered cloud application to automatically generate and optimize game requirement tables based on a horizontal timeline. Users can generate content, receive suggestions based on a core experience, and export the table. The app supports configurable AI model API keys.",
+  "requestFramePermissions": []
+}
