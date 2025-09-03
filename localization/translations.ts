@@ -27,6 +27,7 @@ export const translations = {
         prompt: 'Enter image prompt...',
         techGenDisabled: 'Fill in shot details above to enable generation.',
         techGenEnabled: 'Generate Tech Implementation with AI',
+        deleteStep: 'Delete step {stepName}',
       },
       storyboard: {
         id: 'Storyboard ID',
@@ -124,6 +125,8 @@ export const translations = {
       projectSaveFailed: 'Failed to save project to file.',
       projectLoaded: 'Project loaded from file successfully!',
       projectLoadFailed: 'Failed to load project file. It might be corrupt or in the wrong format.',
+      confirmDeleteStep: 'Are you sure you want to delete the step "{stepName}"? This action cannot be undone.',
+      stepDeleted: 'Timeline step deleted successfully!',
     },
     categories: {
       STORY: {
@@ -182,6 +185,7 @@ export const translations = {
         prompt: '输入图片提示词...',
         techGenDisabled: '请填写以上镜头细节以启用生成功能。',
         techGenEnabled: '使用 AI 生成技术实现',
+        deleteStep: '删除步骤 {stepName}',
       },
       storyboard: {
         id: '分镜需求ID',
@@ -279,6 +283,8 @@ export const translations = {
       projectSaveFailed: '项目保存至文件失败。',
       projectLoaded: '项目已成功从文件加载！',
       projectLoadFailed: '加载项目文件失败。文件可能已损坏或格式不正确。',
+      confirmDeleteStep: '您确定要删除步骤 “{stepName}” 吗？此操作无法撤销。',
+      stepDeleted: '时间线步骤已成功删除！',
     },
     categories: {
       STORY: {

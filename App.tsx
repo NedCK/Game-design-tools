@@ -217,6 +217,47 @@ const App: React.FC = () => {
         }));
     };
 
+    const handleDeleteTimelineStep = (colIndex: number) => {
+        if (!window.confirm(t.notifications.confirmDeleteStep.replace('{stepName}', timeline[colIndex]))) {
+            return;
+        }
+    
+        setTimeline(prev => prev.filter((_, i) => i !== colIndex));
+        setTimelineDescriptions(prev => prev.filter((_, i) => i !== colIndex));
+    
+        const removeAndReIndex = <T extends Record<number, any>>(obj: T): T => {
+            const newObj: Record<number, any> = {};
+            let newIndex = 0;
+            const sortedKeys = Object.keys(obj).map(Number).sort((a, b) => a - b);
+            for (const oldIndex of sortedKeys) {
+                if (oldIndex !== colIndex) {
+                    newObj[newIndex] = obj[oldIndex];
+                    newIndex++;
+                }
+            }
+            return newObj as T;
+        };
+        
+        setGameTable(prev => {
+            const newTable = { ...prev };
+            Object.keys(newTable).forEach(catKey => {
+                const cat = catKey as RequirementCategory;
+                newTable[cat] = (newTable[cat] || []).map(row => removeAndReIndex(row));
+            });
+            return newTable;
+        });
+    
+        setCoreExperience(prev => removeAndReIndex(prev));
+    
+        if (activeCell?.colIndex === colIndex) {
+            setActiveCell(null);
+        } else if (activeCell && activeCell.colIndex > colIndex) {
+            setActiveCell(prev => prev ? { ...prev, colIndex: prev.colIndex - 1 } : null);
+        }
+        
+        setNotification({ type: 'success', message: t.notifications.stepDeleted });
+    };
+
     const handleUpdateCell = (
         category: RequirementCategory,
         rowIndex: number,
@@ -693,6 +734,7 @@ const App: React.FC = () => {
                         onUpdateCell={handleUpdateCell}
                         onUpdateCoreCell={handleUpdateCoreCell}
                         onUpdateTimelineHeader={handleUpdateTimelineHeader}
+                        onDeleteTimelineStep={handleDeleteTimelineStep}
                         activeCell={activeCell}
                         onSelectCell={(category, rowIndex, colIndex) => setActiveCell({ category, rowIndex, colIndex })}
                         onGenerateTechImplementation={handleGenerateTechImplementation}
