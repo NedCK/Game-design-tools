@@ -123,7 +123,7 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
             <table className="w-full border-separate border-spacing-0">
                 <thead>
                     <tr>
-                        <th className="sticky left-0 top-0 z-30 bg-gray-800 p-2 font-bold text-gray-400 border border-gray-700 min-w-[200px]">
+                        <th className="sticky left-0 top-0 z-40 bg-gray-800 p-2 font-bold text-gray-400 border border-gray-700 min-w-[200px]">
                            {t.table.headerCorner}
                         </th>
                         {timeline.map((step, colIndex) => {
@@ -131,7 +131,7 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                             return (
                                 <th 
                                     key={colIndex} 
-                                    className={`group sticky top-0 z-20 bg-gray-800 p-1 border border-gray-700 min-w-[250px] transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-20' : ''}`}
+                                    className={`group sticky top-0 z-30 bg-gray-800 p-1 border border-gray-700 min-w-[250px] transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500' : ''}`}
                                     onClick={() => onSelectCell('timeline', 0, colIndex)}
                                 >
                                      <div className="relative">
@@ -158,7 +158,7 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                         return rowsForCategory.map((row, rowIndex) => (
                              <tr key={`${cat}-${rowIndex}`}>
                                 {rowIndex === 0 && (
-                                     <th scope="row" rowSpan={rowsForCategory.length} className="sticky left-0 z-10 bg-gray-800 p-2 border border-gray-700 text-left align-top">
+                                     <th scope="row" rowSpan={rowsForCategory.length} className="sticky left-0 z-20 bg-gray-800 p-2 border border-gray-700 text-left align-top">
                                         <div className="font-semibold text-purple-300">{translatedCategories[cat].name}</div>
                                         <div className="text-xs text-gray-400 font-normal">{translatedCategories[cat].description}</div>
                                     </th>
@@ -169,7 +169,7 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                                     return (
                                         <td 
                                             key={`${cat}-${rowIndex}-${colIndex}`} 
-                                            className={`bg-gray-800 p-1 border border-gray-700 align-top transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-30 relative' : ''}`}
+                                            className={`bg-gray-800 p-1 border border-gray-700 align-top transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-10 relative' : ''}`}
                                             onClick={() => onSelectCell(cat, rowIndex, colIndex)}
                                         >
                                             {cat === RequirementCategory.STORYBOARD ? (
@@ -196,7 +196,7 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                     })}
                     
                     <tr>
-                        <th scope="row" className="sticky left-0 z-10 bg-gray-800 p-2 border border-gray-700 text-left align-top">
+                        <th scope="row" className="sticky left-0 z-20 bg-gray-800 p-2 border border-gray-700 text-left align-top">
                             <div className="font-semibold text-yellow-300">{t.table.coreExperience}</div>
                         </th>
                          {timeline.map((_, index) => {
@@ -205,7 +205,7 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                             return (
                                 <td 
                                     key={`core-${index}`} 
-                                    className={`bg-gray-800 p-1 border border-gray-700 align-top transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-30 relative' : ''}`}
+                                    className={`bg-gray-800 p-1 border border-gray-700 align-top transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-10 relative' : ''}`}
                                     onClick={() => onSelectCell('core', 0, index)}
                                 >
                                      <div className="flex flex-col h-full min-h-[60px]">
