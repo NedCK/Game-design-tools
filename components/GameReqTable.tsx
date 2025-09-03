@@ -150,7 +150,7 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                                     return (
                                         <td 
                                             key={`${cat}-${rowIndex}-${colIndex}`} 
-                                            className={`p-1 border border-gray-700 align-top transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-30 relative' : ''}`}
+                                            className={`bg-gray-800 p-1 border border-gray-700 align-top transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-30 relative' : ''}`}
                                             onClick={() => onSelectCell(cat, rowIndex, colIndex)}
                                         >
                                             {cat === RequirementCategory.STORYBOARD ? (
@@ -186,7 +186,7 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                             return (
                                 <td 
                                     key={`core-${index}`} 
-                                    className={`p-1 border border-gray-700 align-top transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-30 relative' : ''}`}
+                                    className={`bg-gray-800 p-1 border border-gray-700 align-top transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-30 relative' : ''}`}
                                     onClick={() => onSelectCell('core', 0, index)}
                                 >
                                      <div className="flex flex-col h-full min-h-[60px]">
