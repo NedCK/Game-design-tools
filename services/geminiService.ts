@@ -1,6 +1,7 @@
 
 
 
+
 import { GoogleGenAI, Type, HarmCategory, HarmBlockThreshold } from "@google/genai";
 import { GameTable, CoreExperienceRow, RequirementCategory, GameEngine, RequirementCell } from '../types';
 import { CATEGORY_STATIC_DETAILS } from "../constants";
@@ -28,6 +29,7 @@ const safetySettings = [
 
 export const generateColumnRequirements = async (
     apiKey: string,
+    gameConcept: string,
     timelineStepName: string,
     timelineStepDescription: string,
     categories: Record<RequirementCategory, {name: string}>,
@@ -69,10 +71,11 @@ export const generateColumnRequirements = async (
     const prompt = `You are an expert game designer creating a detailed requirement document.
 Your task is to generate a list of initial requirement descriptions for a specific step in the game's timeline. The game is being developed using the ${engine} game engine. Please tailor any technical suggestions (especially for System Logic and Interaction) to this engine.
 
+Game Concept: ${gameConcept || 'Not specified. You can be creative.'}
 Timeline Step Name: "${timelineStepName}"
 Detailed Description of this Step: "${timelineStepDescription}"
 
-Based on this description, generate a list of brief, one-sentence initial descriptions for any relevant categories from the following list.
+Based on the game concept and this description, generate a list of brief, one-sentence initial descriptions for any relevant categories from the following list.
 Completely ignore the 'UI System' and 'Game Storyboard' categories; they will be handled separately.
 You can provide multiple descriptions for a single category if necessary.
 If a category is not relevant to this timeline step, omit it entirely from your JSON response.

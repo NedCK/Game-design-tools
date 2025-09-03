@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Header } from './components/Header';
 import { Toolbar } from './components/Toolbar';
@@ -344,7 +345,7 @@ const App: React.FC = () => {
             const { colIndex } = activeCell;
             const timelineStepName = timeline[colIndex];
             
-            const result = await generateColumnRequirements(apiKey, timelineStepName, timelineDescription, t.categories as Record<RequirementCategory, {name: string}>, selectedEngine);
+            const result = await generateColumnRequirements(apiKey, gameConcept, timelineStepName, timelineDescription, t.categories as Record<RequirementCategory, {name: string}>, selectedEngine);
             
             setGameTable(prev => {
                 const newTable = JSON.parse(JSON.stringify(prev));
