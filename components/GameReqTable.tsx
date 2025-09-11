@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { GameTable, CoreExperienceRow, RequirementCategory, RequirementCell } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -73,7 +72,7 @@ const StoryboardCellView: React.FC<{
 
                 {/* Row 2: Scene Description */}
                 <label className="font-semibold text-gray-400 text-right self-start pt-2">{labels.sceneDescription}:</label>
-                <EditableCell value={cellData?.description || ''} onSave={(val) => onUpdate('description', val)} placeholder="..." isTextarea />
+                <EditableCell value={cellData?.description || ''} onSave={(val) => onUpdate('description', val)} placeholder={t.table.placeholders.description} isTextarea />
 
                 {/* Row 3: Player Status */}
                 <label className="font-semibold text-gray-400 text-right">{labels.playerStatus}:</label>
@@ -117,6 +116,19 @@ const StoryboardCellView: React.FC<{
 export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable, coreExperience, onUpdateCell, onUpdateCoreCell, onUpdateTimelineHeader, onDeleteTimelineStep, activeCell, onSelectCell, onGenerateTechImplementation }) => {
     const { t } = useLanguage();
     const translatedCategories = t.categories;
+
+    const handleDragOver = (e: React.DragEvent<HTMLTableCellElement>) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+    };
+
+    const handleDragEnter = (e: React.DragEvent<HTMLTableCellElement>) => {
+        e.currentTarget.classList.add('bg-purple-700/50');
+    };
+
+    const handleDragLeave = (e: React.DragEvent<HTMLTableCellElement>) => {
+        e.currentTarget.classList.remove('bg-purple-700/50');
+    };
 
     return (
         <div className="flex-1 bg-gray-800 rounded-lg p-1 shadow-inner relative">
@@ -166,11 +178,27 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                                 {timeline.map((_, colIndex) => {
                                     const isSelected = activeCell?.category === cat && activeCell?.rowIndex === rowIndex && activeCell?.colIndex === colIndex;
                                     const cellData = row[colIndex];
+
+                                    const handleDrop = (e: React.DragEvent<HTMLTableCellElement>) => {
+                                        e.preventDefault();
+                                        e.currentTarget.classList.remove('bg-purple-700/50');
+                                        const droppedText = e.dataTransfer.getData('text/plain');
+                                        if (droppedText) {
+                                            const currentDescription = cellData?.description || '';
+                                            const newDescription = currentDescription ? `${currentDescription}\n${droppedText}` : droppedText;
+                                            onUpdateCell(cat, rowIndex, colIndex, 'description', newDescription);
+                                        }
+                                    };
+
                                     return (
                                         <td 
                                             key={`${cat}-${rowIndex}-${colIndex}`} 
                                             className={`bg-gray-800 p-1 border border-gray-700 align-top transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-10 relative' : ''}`}
                                             onClick={() => onSelectCell(cat, rowIndex, colIndex)}
+                                            onDragOver={handleDragOver}
+                                            onDragEnter={handleDragEnter}
+                                            onDragLeave={handleDragLeave}
+                                            onDrop={handleDrop}
                                         >
                                             {cat === RequirementCategory.STORYBOARD ? (
                                                 <StoryboardCellView
@@ -202,11 +230,27 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                          {timeline.map((_, index) => {
                              const isSelected = activeCell?.category === 'core' && activeCell?.colIndex === index;
                              const cellData = coreExperience[index];
+                             
+                             const handleDrop = (e: React.DragEvent<HTMLTableCellElement>) => {
+                                e.preventDefault();
+                                e.currentTarget.classList.remove('bg-purple-700/50');
+                                const droppedText = e.dataTransfer.getData('text/plain');
+                                if (droppedText) {
+                                    const currentDescription = cellData?.description || '';
+                                    const newDescription = currentDescription ? `${currentDescription}\n${droppedText}` : droppedText;
+                                    onUpdateCoreCell(index, newDescription);
+                                }
+                            };
+
                             return (
                                 <td 
                                     key={`core-${index}`} 
                                     className={`bg-gray-800 p-1 border border-gray-700 align-top transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-10 relative' : ''}`}
                                     onClick={() => onSelectCell('core', 0, index)}
+                                    onDragOver={handleDragOver}
+                                    onDragEnter={handleDragEnter}
+                                    onDragLeave={handleDragLeave}
+                                    onDrop={handleDrop}
                                 >
                                      <div className="flex flex-col h-full min-h-[60px]">
                                         <EditableCell 

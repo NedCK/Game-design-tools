@@ -1,6 +1,3 @@
-
-
-
 export enum RequirementCategory {
   STORY = 'STORY',
   ART = 'ART',
@@ -56,4 +53,16 @@ export interface ApiKey {
 export interface NotificationMessage {
     type: 'success' | 'error' | 'info';
     message: string;
+}
+
+export enum AssetSection {
+  CHARACTER = 'CHARACTER',
+  SCENE = 'SCENE',
+}
+
+export interface ReferenceImage {
+  id: string;
+  dataUrl: string;
+  label: string;
+  section: AssetSection;
 }

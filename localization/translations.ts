@@ -1,5 +1,3 @@
-
-
 export const translations = {
   en: {
     initialTimeline: ['Enter App', 'Transition', 'Start Game'],
@@ -15,14 +13,23 @@ export const translations = {
       saveProject: 'Save Project',
       loadProject: 'Load Project',
     },
+    artAssetPanel: {
+      title: 'Art Asset Board',
+      characters: 'Characters',
+      scenes: 'Scenes',
+      uploadButton: 'Upload Asset',
+      placeholder: 'Upload assets to a section.',
+      deleteLabel: 'Delete asset',
+      tagsTitle: 'Asset Tags (Drag to use)',
+    },
     table: {
       headerCorner: 'Category ↓ / Timeline →',
       category: 'Category',
       reqIdRule: 'Req. ID Rule: [PREFIX]-[###]',
       coreExperience: 'Core Experience',
       placeholders: {
-        description: 'Enter description...',
-        coreExperience: 'Describe experience...',
+        description: 'Enter description or drop asset tag...',
+        coreExperience: 'Describe experience or drop asset tag...',
         image: 'Select to generate an image',
         prompt: 'Enter image prompt...',
         techGenDisabled: 'Fill in shot details above to enable generation.',
@@ -48,7 +55,7 @@ export const translations = {
       refineButton: 'Refine with AI',
       translateButton: 'Translate to Chinese',
       imageGenerationTitle: '2. Generate Storyboard Image',
-      imageGenerationPlaceholder: 'Select a storyboard cell, then describe the scene to generate an image.',
+      imageGenerationPlaceholder: 'Select a storyboard cell, then describe the scene to generate an image. The AI will use the Art Asset Board for style consistency.',
       imageGenerationButton: 'Generate Image',
       gameConceptTitle: '3. Game Concept Design',
       gameConceptPlaceholder: 'Describe the overall art style, mood, key characters, and setting of your game here. This will guide the AI in generating consistent storyboard images.',
@@ -88,7 +95,7 @@ export const translations = {
           generateColumn: '**Generate Column Requirements:** Select a timeline header (e.g., "Start Game"). Describe the events of that step in the AI Assistant panel on the right, and click "Generate Requirements" to have the AI populate the entire column with initial ideas.',
           refineCell: '**Refine & Translate:** Select any individual requirement cell. The AI Assistant will show its content. You can then use the "Refine with AI" button to expand on the idea or "Translate" to convert it to Chinese.',
           consolidateUI: '**Consolidate UI System:** After generating requirements for a column, select that same timeline header again and click "Consolidate UI Requirements". The AI will read all the requirements in that column and create a specific to-do list for the UI/UX team in the "UI System" row.',
-          generateStoryboard: '**Generate Storyboard:** In the "Game Storyboard" row, you can detail a specific scene. Use the AI Assistant to enter a prompt in the "Generate Storyboard Image" section and click the button to create a visual sketch. You can also fill in details like "Shot Time" and then click the sparkle icon in the cell to have the AI generate a technical implementation plan.',
+          generateStoryboard: '**Generate Storyboard:** Use the **Art Asset Board** at the top to upload character or environment art. In the "Game Storyboard" row, you can detail a specific scene. Use the AI Assistant to enter a prompt in the "Generate Storyboard Image" section and click the button to create a visual sketch that is consistent with your references. You can also fill in details like "Shot Time" and then click the sparkle icon in the cell to have the AI generate a technical implementation plan.',
           alignExperience: '**Align to Core Experience (Key Feature):** This is the most powerful feature. First, fill in the "Core Experience" row for a specific timeline step, describing the emotion or feeling you want the player to have (e.g., "A sense of wonder and discovery"). Then, select that Core Experience cell. In the AI Assistant, a new option will appear. Click "Get Alignment Suggestions" to receive detailed feedback on how to adjust the Narrative, Art, Interaction, Audio, and Storyboard descriptions in that column to better achieve your desired core experience.'
         },
         projectManagement: {
@@ -173,14 +180,23 @@ export const translations = {
       saveProject: '保存项目',
       loadProject: '加载项目',
     },
+    artAssetPanel: {
+      title: '美术资产看板',
+      characters: '人物角色',
+      scenes: '场景',
+      uploadButton: '上传资产',
+      placeholder: '将资产上传到分区。',
+      deleteLabel: '删除资产',
+      tagsTitle: '资产标签 (可拖拽使用)',
+    },
     table: {
       headerCorner: '分类 ↓ / 时间轴 →',
       category: '类别',
       reqIdRule: '需求 ID 规则：[前缀]-[###]',
       coreExperience: '核心体验',
       placeholders: {
-        description: '输入描述...',
-        coreExperience: '描述体验...',
+        description: '输入描述或拖入资产标签...',
+        coreExperience: '描述体验或拖入资产标签...',
         image: '选择以生成图片',
         prompt: '输入图片提示词...',
         techGenDisabled: '请填写以上镜头细节以启用生成功能。',
@@ -206,7 +222,7 @@ export const translations = {
       refineButton: '使用 AI 优化',
       translateButton: '翻译成中文',
       imageGenerationTitle: '2. 生成分镜图片',
-      imageGenerationPlaceholder: '选择一个分镜单元格，然后描述要生成的场景。',
+      imageGenerationPlaceholder: '选择一个分镜单元格，然后描述要生成的场景。AI 将使用美术资产看板来确保风格一致性。',
       imageGenerationButton: '生成图片',
       gameConceptTitle: '3. 游戏概念设计',
       gameConceptPlaceholder: '在此描述您游戏的整体美术风格、氛围、关键角色和设定。这将指导AI生成风格一致的分镜草图。',
@@ -246,7 +262,7 @@ export const translations = {
           generateColumn: '**生成整列需求：** 选择一个时间线标题（例如，“开始游戏”）。在右侧的 AI 助手面板中描述该步骤中发生的事件，然后点击“生成需求”，AI 将会为整个列填充初步的想法。',
           refineCell: '**优化和翻译单元格：** 选择任何一个独立的需求单元格。AI 助手将显示其内容。然后您可以使用“使用 AI 优化”按钮来扩展想法，或使用“翻译”按钮将其转换为中文。',
           consolidateUI: '**整合UI系统需求：** 为某一列生成需求后，再次选择该列的时间线标题，然后点击“整合UI需求”。AI 将读取该列中的所有需求，并在“UI系统”行中为 UI/UX 团队创建一个具体的待办事项列表。',
-          generateStoryboard: '**生成游戏分镜：** 在“游戏分镜”行中，您可以详细描述一个特定场景。在 AI 助手中，于“生成分镜图片”部分输入提示词，然后点击按钮即可创建一张视觉草图。您还可以填写“镜头时间”等细节，然后点击单元格内的小图标，让 AI 生成技术实现方案。',
+          generateStoryboard: '**生成游戏分镜：** 使用顶部的 **美术资产看板** 上传角色或环境美术图。在“游戏分镜”行中，您可以详细描述一个特定场景。在 AI 助手中，于“生成分镜图片”部分输入提示词，然后点击按钮即可创建一张与您的参考图风格一致的视觉草图。您还可以填写“镜头时间”等细节，然后点击单元格内的小图标，让 AI 生成技术实现方案。',
           alignExperience: '**对齐核心体验（核心功能）：** 这是最强大的功能。首先，为特定的时间线步骤填写“核心体验”行，描述您希望玩家拥有的情感或感觉（例如，“一种奇妙和发现的感觉”）。然后，选中那个核心体验单元格。在 AI 助手中会出现一个新选项，点击“获取对齐建议”，AI 会提供详细的反馈，告诉您如何调整该列中的叙事、美术、互动、音频和分镜描述，以更好地实现您期望的核心体验。'
         },
         projectManagement: {

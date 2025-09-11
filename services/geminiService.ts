@@ -2,8 +2,10 @@
 
 
 
+
+
 import { GoogleGenAI, Type, HarmCategory, HarmBlockThreshold } from "@google/genai";
-import { GameTable, CoreExperienceRow, RequirementCategory, GameEngine, RequirementCell } from '../types';
+import { GameTable, CoreExperienceRow, RequirementCategory, GameEngine, RequirementCell, ReferenceImage } from '../types';
 import { CATEGORY_STATIC_DETAILS } from "../constants";
 
 // Define safety settings to be less restrictive, preventing blocks on potentially sensitive game content.
@@ -208,23 +210,72 @@ Based on this, please provide a refined, more detailed description. The new desc
 export const generateImage = async (
     apiKey: string,
     prompt: string,
-    gameConcept: string
+    gameConcept: string,
+    referenceImages: ReferenceImage[]
 ): Promise<string> => {
     if (!apiKey) {
         throw new Error("Gemini API key is missing.");
     }
     const ai = new GoogleGenAI({ apiKey });
 
+    let finalPrompt = prompt;
+
+    // If there are reference images, use a two-step process to generate a better prompt
+    if (referenceImages && referenceImages.length > 0) {
+        const imageParts = referenceImages.map(refImg => {
+            const [header, base64Data] = refImg.dataUrl.split(',');
+            const mimeType = header.match(/:(.*?);/)?.[1] || 'image/png';
+            return {
+                inlineData: {
+                    mimeType: mimeType,
+                    data: base64Data,
+                },
+            };
+        });
+
+        const referenceLabels = referenceImages.map(refImg => `- ${refImg.label}`).join('\n');
+
+        const promptEnhancementRequest = {
+            model: 'gemini-2.5-flash',
+            contents: {
+                parts: [
+                    ...imageParts,
+                    { text: `You are a world-class prompt engineer for a generative AI model that creates images.
+You will be given a set of reference images with labels, a general game concept, and a user's simple prompt for a specific scene.
+Your task is to synthesize all this information into a single, highly detailed, and descriptive prompt for the image generation model.
+The final prompt MUST incorporate the visual style, character designs, and atmosphere from the reference images.
+
+**Reference Images Provided:**
+${referenceLabels}
+
+**Overall Game Concept:**
+${gameConcept || 'Not specified, but derive from the reference images.'}
+
+**User's simple prompt for this scene:**
+"${prompt}"
+
+Now, generate the detailed prompt. The prompt should be a single paragraph of descriptive text. Do not add any extra commentary or introductory phrases. Just return the prompt itself.` }
+                ]
+            }
+        };
+
+        const enhancedPromptResponse = await ai.models.generateContent(promptEnhancementRequest);
+        finalPrompt = enhancedPromptResponse.text;
+    }
+    
+    // This is the second step (or the only step if no reference images)
     const conceptPreamble = gameConcept 
         ? `First, strictly adhere to the following overall game concept design to ensure visual consistency. Game Concept: "${gameConcept}". `
         : '';
 
-    const finalPrompt = `${conceptPreamble}Now, create a cinematic, high-quality storyboard frame for a video game. Style: professional concept art, detailed, atmospheric. Content: ${prompt}`;
+    const imageGenerationPrompt = referenceImages && referenceImages.length > 0 
+        ? finalPrompt // Use the highly detailed prompt we just generated
+        : `${conceptPreamble}Now, create a cinematic, high-quality storyboard frame for a video game. Style: professional concept art, detailed, atmospheric. Content: ${prompt}`;
 
     try {
         const response = await ai.models.generateImages({
             model: 'imagen-4.0-generate-001',
-            prompt: finalPrompt,
+            prompt: imageGenerationPrompt,
             config: {
               numberOfImages: 1,
               outputMimeType: 'image/jpeg',
@@ -243,6 +294,7 @@ export const generateImage = async (
         throw new Error("Failed to generate image from AI. Please check your API key and prompt.");
     }
 };
+
 
 export const translateToChinese = async (
     apiKey: string,
