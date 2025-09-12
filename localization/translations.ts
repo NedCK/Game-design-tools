@@ -35,6 +35,8 @@ export const translations = {
         techGenDisabled: 'Fill in shot details above to enable generation.',
         techGenEnabled: 'Generate Tech Implementation with AI',
         deleteStep: 'Delete step {stepName}',
+        addStoryboard: 'Add storyboard entry',
+        deleteStoryboard: 'Clear storyboard entry',
       },
       storyboard: {
         id: 'Storyboard ID',
@@ -202,6 +204,8 @@ export const translations = {
         techGenDisabled: '请填写以上镜头细节以启用生成功能。',
         techGenEnabled: '使用 AI 生成技术实现',
         deleteStep: '删除步骤 {stepName}',
+        addStoryboard: '添加分镜条目',
+        deleteStoryboard: '清除分镜条目',
       },
       storyboard: {
         id: '分镜需求ID',

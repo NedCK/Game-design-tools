@@ -390,6 +390,20 @@ const App: React.FC = () => {
             return newTable;
         });
     };
+
+    const handleClearCell = (category: RequirementCategory, rowIndex: number, colIndex: number) => {
+        setGameTable(prev => {
+            const newTable = { ...prev };
+            const newRows = [...newTable[category]];
+            const newRow = { ...newRows[rowIndex] };
+
+            newRow[colIndex] = { id: '', description: '' };
+
+            newRows[rowIndex] = newRow;
+            newTable[category] = newRows;
+            return newTable;
+        });
+    };
     
     const handleUpdateCoreCell = (index: number, value: string) => {
         setCoreExperience(prev => ({
@@ -851,6 +865,7 @@ const App: React.FC = () => {
                         gameTable={gameTable}
                         coreExperience={coreExperience}
                         onUpdateCell={handleUpdateCell}
+                        onClearCell={handleClearCell}
                         onUpdateCoreCell={handleUpdateCoreCell}
                         onUpdateTimelineHeader={handleUpdateTimelineHeader}
                         onDeleteTimelineStep={handleDeleteTimelineStep}

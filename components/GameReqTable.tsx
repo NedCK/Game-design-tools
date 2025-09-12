@@ -7,6 +7,7 @@ interface GameReqTableProps {
     gameTable: GameTable;
     coreExperience: CoreExperienceRow;
     onUpdateCell: (category: RequirementCategory, rowIndex: number, colIndex: number, field: keyof Omit<RequirementCell, 'id' | 'imageUrl'>, value: string) => void;
+    onClearCell: (category: RequirementCategory, rowIndex: number, colIndex: number) => void;
     onUpdateCoreCell: (index: number, value: string) => void;
     onUpdateTimelineHeader: (index: number, value: string) => void;
     onDeleteTimelineStep: (colIndex: number) => void;
@@ -50,17 +51,35 @@ const TrashIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     </svg>
 );
 
+const AddIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+);
+
+
 const StoryboardCellView: React.FC<{
     cellData: RequirementCell;
     onUpdate: (field: keyof Omit<RequirementCell, 'id' | 'imageUrl'>, value: string) => void;
     onGenerateTechImplementation: () => void;
-}> = ({ cellData, onUpdate, onGenerateTechImplementation }) => {
+    onClear: () => void;
+}> = ({ cellData, onUpdate, onGenerateTechImplementation, onClear }) => {
     const { t } = useLanguage();
     const labels = t.table.storyboard;
     const isGenerationDisabled = !cellData?.shotTime && !cellData?.description && !cellData?.playerStatus;
 
     return (
-        <div className="p-1 text-xs">
+        <div className="p-1 text-xs relative">
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onClear();
+                }}
+                className="absolute top-0 right-0 m-1 p-1 text-red-500 rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-500/20 focus:opacity-100 focus:outline-none transition-opacity"
+                aria-label={t.table.placeholders.deleteStoryboard}
+            >
+                <TrashIcon className="w-4 h-4" />
+            </button>
             <div className="flex items-center gap-2 mb-2">
                 <span className="font-semibold text-gray-400">{labels.id}:</span>
                 <span className="font-mono text-gray-500">{cellData?.id}</span>
@@ -113,7 +132,7 @@ const StoryboardCellView: React.FC<{
 }
 
 
-export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable, coreExperience, onUpdateCell, onUpdateCoreCell, onUpdateTimelineHeader, onDeleteTimelineStep, activeCell, onSelectCell, onGenerateTechImplementation }) => {
+export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable, coreExperience, onUpdateCell, onClearCell, onUpdateCoreCell, onUpdateTimelineHeader, onDeleteTimelineStep, activeCell, onSelectCell, onGenerateTechImplementation }) => {
     const { t } = useLanguage();
     const translatedCategories = t.categories;
 
@@ -178,7 +197,15 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                                 {timeline.map((_, colIndex) => {
                                     const isSelected = activeCell?.category === cat && activeCell?.rowIndex === rowIndex && activeCell?.colIndex === colIndex;
                                     const cellData = row[colIndex];
+                                    const isStoryboard = cat === RequirementCategory.STORYBOARD;
+                                    const storyboardHasContent = isStoryboard && cellData && cellData.id;
 
+                                    const handleAddStoryboard = () => {
+                                        // Using a non-whitespace character to trigger ID generation in App.tsx
+                                        onUpdateCell(cat, rowIndex, colIndex, 'shotTime', '-');
+                                        onSelectCell(cat, rowIndex, colIndex);
+                                    };
+                                    
                                     const handleDrop = (e: React.DragEvent<HTMLTableCellElement>) => {
                                         e.preventDefault();
                                         e.currentTarget.classList.remove('bg-purple-700/50');
@@ -187,25 +214,38 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                                             const currentDescription = cellData?.description || '';
                                             const newDescription = currentDescription ? `${currentDescription}\n${droppedText}` : droppedText;
                                             onUpdateCell(cat, rowIndex, colIndex, 'description', newDescription);
+                                            onSelectCell(cat, rowIndex, colIndex);
                                         }
                                     };
 
                                     return (
                                         <td 
                                             key={`${cat}-${rowIndex}-${colIndex}`} 
-                                            className={`bg-gray-800 p-1 border border-gray-700 align-top transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-10 relative' : ''}`}
-                                            onClick={() => onSelectCell(cat, rowIndex, colIndex)}
+                                            className={`group bg-gray-800 p-1 border border-gray-700 align-top transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500 z-10 relative' : ''}`}
+                                            onClick={isStoryboard && !storyboardHasContent ? handleAddStoryboard : () => onSelectCell(cat, rowIndex, colIndex)}
                                             onDragOver={handleDragOver}
                                             onDragEnter={handleDragEnter}
                                             onDragLeave={handleDragLeave}
                                             onDrop={handleDrop}
                                         >
-                                            {cat === RequirementCategory.STORYBOARD ? (
-                                                <StoryboardCellView
-                                                    cellData={cellData}
-                                                    onUpdate={(field, value) => onUpdateCell(cat, rowIndex, colIndex, field, value)}
-                                                    onGenerateTechImplementation={() => onGenerateTechImplementation(cat, rowIndex, colIndex)}
-                                                />
+                                            {isStoryboard ? (
+                                                storyboardHasContent ? (
+                                                    <StoryboardCellView
+                                                        cellData={cellData}
+                                                        onUpdate={(field, value) => onUpdateCell(cat, rowIndex, colIndex, field, value)}
+                                                        onGenerateTechImplementation={() => onGenerateTechImplementation(cat, rowIndex, colIndex)}
+                                                        onClear={() => onClearCell(cat, rowIndex, colIndex)}
+                                                    />
+                                                ) : (
+                                                    <div className="flex items-center justify-center h-full min-h-[60px]">
+                                                        <div
+                                                            className="p-2 text-gray-400 rounded-full group-hover:bg-purple-700/50 group-hover:text-white transition-colors"
+                                                            aria-label={t.table.placeholders.addStoryboard}
+                                                        >
+                                                            <AddIcon className="w-6 h-6" />
+                                                        </div>
+                                                    </div>
+                                                )
                                             ) : (
                                                 <div className="flex flex-col h-full min-h-[60px]">
                                                     <span className="text-xs font-mono text-gray-500 px-1 pt-1">{cellData?.id}</span>
@@ -239,6 +279,7 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                                     const currentDescription = cellData?.description || '';
                                     const newDescription = currentDescription ? `${currentDescription}\n${droppedText}` : droppedText;
                                     onUpdateCoreCell(index, newDescription);
+                                    onSelectCell('core', 0, index);
                                 }
                             };
 
