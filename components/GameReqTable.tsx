@@ -218,7 +218,6 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, timelineDe
                                         <EditableCell
                                             value={timelineDescriptions[colIndex] || ''}
                                             onSave={(val) => onUpdateTimelineDescription(colIndex, val)}
-                                            onChange={(val) => onUpdateTimelineDescription(colIndex, val)}
                                             isHeader={false}
                                             placeholder={t.table.placeholders.timelineDescription}
                                             isTextarea={true}
