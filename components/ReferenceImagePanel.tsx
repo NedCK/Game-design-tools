@@ -17,6 +17,8 @@ const TrashIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 
 interface ReferenceImagePanelProps {
     images: ReferenceImage[];
+    gameConcept: string;
+    onUpdateGameConcept: (value: string) => void;
     onCharacterUploadClick: () => void;
     onSceneUploadClick: () => void;
     onUpdateLabel: (id: string, label: string) => void;
@@ -79,7 +81,7 @@ const AssetSectionPanel: React.FC<{
 };
 
 
-export const ReferenceImagePanel: React.FC<ReferenceImagePanelProps> = ({ images, onCharacterUploadClick, onSceneUploadClick, onUpdateLabel, onDelete }) => {
+export const ReferenceImagePanel: React.FC<ReferenceImagePanelProps> = ({ images, gameConcept, onUpdateGameConcept, onCharacterUploadClick, onSceneUploadClick, onUpdateLabel, onDelete }) => {
     const { t } = useLanguage();
 
     const characterImages = images.filter(img => img.section === AssetSection.CHARACTER);
@@ -93,6 +95,17 @@ export const ReferenceImagePanel: React.FC<ReferenceImagePanelProps> = ({ images
     return (
         <div className="bg-gray-800 rounded-lg p-4 shadow-inner mb-4 flex flex-col gap-6">
             <h3 className="text-lg font-bold text-purple-300 mb-0 border-b border-gray-700 pb-3">{t.artAssetPanel.title}</h3>
+            
+            <div>
+                <h4 className="text-md font-semibold text-gray-300 mb-2">{t.artAssetPanel.conceptTitle}</h4>
+                <textarea
+                    value={gameConcept}
+                    onChange={(e) => onUpdateGameConcept(e.target.value)}
+                    placeholder={t.artAssetPanel.conceptPlaceholder}
+                    className="w-full h-24 p-2 bg-gray-900 border border-gray-600 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none transition-colors text-sm"
+                    aria-label={t.artAssetPanel.conceptTitle}
+                />
+            </div>
             
             <AssetSectionPanel 
                 title={t.artAssetPanel.characters}

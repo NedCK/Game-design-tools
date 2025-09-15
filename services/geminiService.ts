@@ -1,9 +1,3 @@
-
-
-
-
-
-
 import { GoogleGenAI, Type, HarmCategory, HarmBlockThreshold } from "@google/genai";
 import { GameTable, CoreExperienceRow, RequirementCategory, GameEngine, RequirementCell, ReferenceImage } from '../types';
 import { CATEGORY_STATIC_DETAILS } from "../constants";
@@ -220,9 +214,26 @@ export const generateImage = async (
 
     let finalPrompt = prompt;
 
-    // If there are reference images, use a two-step process to generate a better prompt
-    if (referenceImages && referenceImages.length > 0) {
-        const imageParts = referenceImages.map(refImg => {
+    // Find tags in the prompt (e.g., #Character Name) and create a unique set of labels.
+    const tags = [...new Set([...prompt.matchAll(/#([\w\s-]+)/g)].map(match => match[1].trim()))];
+    
+    // Determine which images to use for enhancement
+    let imagesForEnhancement: ReferenceImage[] = [];
+    let enhancementMode: 'tagged' | 'general' = 'general';
+
+    if (tags.length > 0) {
+        // If there are tags, use only the images that match the tags.
+        imagesForEnhancement = referenceImages.filter(img => tags.includes(img.label));
+        enhancementMode = 'tagged';
+    } else if (referenceImages.length > 0) {
+        // If no tags but images exist, use all of them for general style.
+        imagesForEnhancement = referenceImages;
+        enhancementMode = 'general';
+    }
+    
+    // If there are reference images to send, use the two-step process to generate a better prompt
+    if (imagesForEnhancement.length > 0) {
+        const imageParts = imagesForEnhancement.map(refImg => {
             const [header, base64Data] = refImg.dataUrl.split(',');
             const mimeType = header.match(/:(.*?);/)?.[1] || 'image/png';
             return {
@@ -233,14 +244,26 @@ export const generateImage = async (
             };
         });
 
-        const referenceLabels = referenceImages.map(refImg => `- ${refImg.label}`).join('\n');
+        const referenceLabels = imagesForEnhancement.map(refImg => `- ${refImg.label}`).join('\n');
+        
+        let enhancerPromptText = '';
+        if (enhancementMode === 'tagged') {
+             enhancerPromptText = `You are a world-class prompt engineer for a generative AI model that creates images.
+Your task is to synthesize information into a single, highly detailed prompt for an image generation model.
+The user's prompt for the scene contains tags starting with '#', like '#Hero'. These tags directly correspond to the reference images provided, which are labeled accordingly. When you see a tag, you MUST use the visual information from the corresponding reference image for that element in your output prompt.
 
-        const promptEnhancementRequest = {
-            model: 'gemini-2.5-flash',
-            contents: {
-                parts: [
-                    ...imageParts,
-                    { text: `You are a world-class prompt engineer for a generative AI model that creates images.
+**Reference Images Provided (linked to tags in the prompt):**
+${referenceLabels}
+
+**Overall Game Concept (for style and mood):**
+${gameConcept || 'Not specified, but derive from the reference images and prompt.'}
+
+**User's prompt for this scene:**
+"${prompt}"
+
+Now, generate the detailed, master prompt. Ensure you describe the scene incorporating the specific characters/scenes from the tagged reference images. Remove the tags (e.g., #Hero) from your final output prompt. Return only the prompt itself.`;
+        } else { // 'general' mode
+             enhancerPromptText = `You are a world-class prompt engineer for a generative AI model that creates images.
 You will be given a set of reference images with labels, a general game concept, and a user's simple prompt for a specific scene.
 Your task is to synthesize all this information into a single, highly detailed, and descriptive prompt for the image generation model.
 The final prompt MUST incorporate the visual style, character designs, and atmosphere from the reference images.
@@ -254,7 +277,15 @@ ${gameConcept || 'Not specified, but derive from the reference images.'}
 **User's simple prompt for this scene:**
 "${prompt}"
 
-Now, generate the detailed prompt. The prompt should be a single paragraph of descriptive text. Do not add any extra commentary or introductory phrases. Just return the prompt itself.` }
+Now, generate the detailed prompt. The prompt should be a single paragraph of descriptive text. Do not add any extra commentary or introductory phrases. Just return the prompt itself.`;
+        }
+
+        const promptEnhancementRequest = {
+            model: 'gemini-2.5-flash',
+            contents: {
+                parts: [
+                    ...imageParts,
+                    { text: enhancerPromptText }
                 ]
             }
         };
@@ -263,12 +294,11 @@ Now, generate the detailed prompt. The prompt should be a single paragraph of de
         finalPrompt = enhancedPromptResponse.text;
     }
     
-    // This is the second step (or the only step if no reference images)
-    const conceptPreamble = gameConcept 
+    const conceptPreamble = gameConcept && imagesForEnhancement.length === 0
         ? `First, strictly adhere to the following overall game concept design to ensure visual consistency. Game Concept: "${gameConcept}". `
         : '';
 
-    const imageGenerationPrompt = referenceImages && referenceImages.length > 0 
+    const imageGenerationPrompt = imagesForEnhancement.length > 0 
         ? finalPrompt // Use the highly detailed prompt we just generated
         : `${conceptPreamble}Now, create a cinematic, high-quality storyboard frame for a video game. Style: professional concept art, detailed, atmospheric. Content: ${prompt}`;
 

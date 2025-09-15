@@ -397,7 +397,18 @@ const App: React.FC = () => {
             const newRows = [...newTable[category]];
             const newRow = { ...newRows[rowIndex] };
 
-            newRow[colIndex] = { id: '', description: '' };
+            // Explicitly clear all fields for a cell, especially for storyboard cells,
+            // to ensure the AI panel and other components sync correctly after deletion.
+            const clearedCell: RequirementCell = { 
+                id: '', 
+                description: '',
+                imageUrl: undefined,
+                shotTime: '',
+                playerStatus: '',
+                techImplementation: '',
+                sketchPrompt: '',
+            };
+            newRow[colIndex] = clearedCell;
 
             newRows[rowIndex] = newRow;
             newTable[category] = newRows;
@@ -855,6 +866,8 @@ const App: React.FC = () => {
                     />
                     <ReferenceImagePanel 
                         images={referenceImages}
+                        gameConcept={gameConcept}
+                        onUpdateGameConcept={setGameConcept}
                         onCharacterUploadClick={() => handleReferenceImageUploadClick(AssetSection.CHARACTER)}
                         onSceneUploadClick={() => handleReferenceImageUploadClick(AssetSection.SCENE)}
                         onUpdateLabel={handleUpdateReferenceImageLabel}
@@ -902,8 +915,6 @@ const App: React.FC = () => {
                             handleUpdateTimelineDescription(activeCell.colIndex, value);
                         }
                     }}
-                    gameConcept={gameConcept}
-                    onUpdateGameConcept={setGameConcept}
                 />
             </main>
             {isSettingsOpen && (

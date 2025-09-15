@@ -53,14 +53,12 @@ interface AIPanelProps {
     activeTimelineStepName: string;
     activeTimelineDescription: string;
     onUpdateActiveTimelineDescription: (value: string) => void;
-    gameConcept: string;
-    onUpdateGameConcept: (value: string) => void;
 }
 
 export const AIPanel: React.FC<AIPanelProps> = ({
     onGenerateColumn, onConsolidateUI, onRefine, onTranslate, onGenerateImage, onAlignColumn, suggestions, isLoading, loadingMessage,
     activeCell, activeCellContent, onUpdateActiveCellContent, activeCellSketchPrompt, onUpdateActiveCellSketchPrompt, activeTimelineStepName,
-    activeTimelineDescription, onUpdateActiveTimelineDescription, gameConcept, onUpdateGameConcept
+    activeTimelineDescription, onUpdateActiveTimelineDescription
 }) => {
     const { t } = useLanguage();
     
@@ -173,21 +171,8 @@ export const AIPanel: React.FC<AIPanelProps> = ({
                     )}
                 </div>
             </div>
-
-            {/* 3. Game Concept Design */}
-            <div>
-                <h3 className="text-md font-semibold mb-2">{t.aiPanel.gameConceptTitle}</h3>
-                <textarea
-                    value={gameConcept}
-                    onChange={(e) => onUpdateGameConcept(e.target.value)}
-                    placeholder={t.aiPanel.gameConceptPlaceholder}
-                    className="w-full h-32 p-2 bg-gray-900 border border-gray-600 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none transition-colors text-sm"
-                    disabled={isLoading}
-                    aria-label={t.aiPanel.gameConceptTitle}
-                />
-            </div>
-
-            {/* 4. UI Consolidation */}
+            
+            {/* 3. UI Consolidation */}
             <div className={`transition-opacity ${!isUISystemCellSelected && !isLoading ? 'opacity-50' : 'opacity-100'}`}>
                 <div>
                     <h3 className="text-md font-semibold mb-2">{t.aiPanel.consolidateTitle}</h3>
@@ -208,7 +193,7 @@ export const AIPanel: React.FC<AIPanelProps> = ({
                 </div>
             </div>
 
-            {/* 5. Core Experience Alignment */}
+            {/* 4. Core Experience Alignment */}
             <div className={`transition-opacity ${!isCoreCellSelected && !isLoading ? 'opacity-50' : 'opacity-100'}`}>
                 <div>
                     <h3 className="text-md font-semibold mb-2">{t.aiPanel.alignTitle}</h3>
@@ -229,7 +214,7 @@ export const AIPanel: React.FC<AIPanelProps> = ({
                 </div>
             </div>
             
-            {/* 6. Suggestions Display */}
+            {/* 5. Suggestions Display */}
             <div className="flex-1 flex flex-col min-h-0">
                 <h3 className="text-md font-semibold mb-2">{t.aiPanel.resultsTitle}</h3>
                 <div className="flex-1 p-2 bg-gray-900 border border-gray-600 rounded-md overflow-y-auto text-sm prose prose-invert prose-sm max-w-none">
