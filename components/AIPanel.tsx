@@ -68,6 +68,7 @@ export const AIPanel: React.FC<AIPanelProps> = ({
     const isRequirementCellSelected = activeCell && activeCell.category !== 'timeline' && activeCell.category !== 'core';
     const isStoryboardCellSelected = activeCell?.category === RequirementCategory.STORYBOARD;
     const isCoreCellSelected = activeCell?.category === 'core';
+    const isUISystemCellSelected = activeCell?.category === RequirementCategory.UI_SYSTEM;
 
     const contentForPanel = isStoryboardCellSelected ? activeCellSketchPrompt : activeCellContent;
     const updateContentForPanel = isStoryboardCellSelected ? onUpdateActiveCellSketchPrompt : onUpdateActiveCellContent;
@@ -186,40 +187,49 @@ export const AIPanel: React.FC<AIPanelProps> = ({
                 />
             </div>
 
-            {/* 4. UI Consolidation & Core Experience Alignment */}
-            <div className={`transition-opacity ${!isTimelineSelected && !isCoreCellSelected && !isLoading ? 'opacity-50' : 'opacity-100'}`}>
-                { isTimelineSelected && (
-                    <div>
-                        <h3 className="text-md font-semibold mb-2">{t.aiPanel.consolidateTitle}</h3>
-                        <button
-                            onClick={onConsolidateUI}
-                            disabled={isLoading}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <ConsolidateIcon className="w-5 h-5" />
-                            {t.aiPanel.consolidateButton}
-                        </button>
-                    </div>
-                )}
-                 { isCoreCellSelected && (
-                    <div>
-                        <h3 className="text-md font-semibold mb-2">{t.aiPanel.alignTitle}</h3>
-                         <p className="text-xs text-gray-400 mb-2">
-                            {t.aiPanel.alignDescription.replace('{stepName}', `"${activeTimelineStepName}"`)}
-                        </p>
-                        <button
-                            onClick={onAlignColumn}
-                            disabled={isLoading || !activeCellContent}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-yellow-600 rounded-md hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <AlignIcon className="w-5 h-5" />
-                            {t.aiPanel.alignButton}
-                        </button>
-                    </div>
-                )}
+            {/* 4. UI Consolidation */}
+            <div className={`transition-opacity ${!isUISystemCellSelected && !isLoading ? 'opacity-50' : 'opacity-100'}`}>
+                <div>
+                    <h3 className="text-md font-semibold mb-2">{t.aiPanel.consolidateTitle}</h3>
+                    <p className="text-xs text-gray-400 mb-2">
+                        {isUISystemCellSelected
+                            ? t.aiPanel.consolidateDescription.replace('{stepName}', `"${activeTimelineStepName}"`)
+                            : t.aiPanel.consolidatePlaceholder
+                        }
+                    </p>
+                    <button
+                        onClick={onConsolidateUI}
+                        disabled={!isUISystemCellSelected || isLoading}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+                    >
+                        <ConsolidateIcon className="w-5 h-5" />
+                        {t.aiPanel.consolidateButton}
+                    </button>
+                </div>
+            </div>
+
+            {/* 5. Core Experience Alignment */}
+            <div className={`transition-opacity ${!isCoreCellSelected && !isLoading ? 'opacity-50' : 'opacity-100'}`}>
+                <div>
+                    <h3 className="text-md font-semibold mb-2">{t.aiPanel.alignTitle}</h3>
+                    <p className="text-xs text-gray-400 mb-2">
+                        {isCoreCellSelected
+                            ? t.aiPanel.alignDescription.replace('{stepName}', `"${activeTimelineStepName}"`)
+                            : t.aiPanel.alignPlaceholder
+                        }
+                    </p>
+                    <button
+                        onClick={onAlignColumn}
+                        disabled={isLoading || !isCoreCellSelected || !activeCellContent}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-yellow-600 rounded-md hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+                    >
+                        <AlignIcon className="w-5 h-5" />
+                        {t.aiPanel.alignButton}
+                    </button>
+                </div>
             </div>
             
-            {/* 5. Suggestions Display */}
+            {/* 6. Suggestions Display */}
             <div className="flex-1 flex flex-col min-h-0">
                 <h3 className="text-md font-semibold mb-2">{t.aiPanel.resultsTitle}</h3>
                 <div className="flex-1 p-2 bg-gray-900 border border-gray-600 rounded-md overflow-y-auto text-sm prose prose-invert prose-sm max-w-none">

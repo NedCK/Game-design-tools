@@ -521,8 +521,8 @@ const App: React.FC = () => {
             setIsSettingsOpen(true);
             return;
         }
-        if (!activeCell || activeCell.category !== 'timeline') {
-            setNotification({ type: 'error', message: "Please select a timeline column header to consolidate UI." });
+        if (!activeCell || activeCell.category !== RequirementCategory.UI_SYSTEM) {
+            setNotification({ type: 'error', message: "Please select a cell in the UI System row to consolidate requirements." });
             return;
         }
 
