@@ -862,12 +862,14 @@ const App: React.FC = () => {
                     />
                     <GameReqTable 
                         timeline={timeline}
+                        timelineDescriptions={timelineDescriptions}
                         gameTable={gameTable}
                         coreExperience={coreExperience}
                         onUpdateCell={handleUpdateCell}
                         onClearCell={handleClearCell}
                         onUpdateCoreCell={handleUpdateCoreCell}
                         onUpdateTimelineHeader={handleUpdateTimelineHeader}
+                        onUpdateTimelineDescription={handleUpdateTimelineDescription}
                         onDeleteTimelineStep={handleDeleteTimelineStep}
                         activeCell={activeCell}
                         onSelectCell={(category, rowIndex, colIndex) => setActiveCell({ category, rowIndex, colIndex })}

@@ -4,12 +4,14 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 interface GameReqTableProps {
     timeline: string[];
+    timelineDescriptions: string[];
     gameTable: GameTable;
     coreExperience: CoreExperienceRow;
     onUpdateCell: (category: RequirementCategory, rowIndex: number, colIndex: number, field: keyof Omit<RequirementCell, 'id' | 'imageUrl'>, value: string) => void;
     onClearCell: (category: RequirementCategory, rowIndex: number, colIndex: number) => void;
     onUpdateCoreCell: (index: number, value: string) => void;
     onUpdateTimelineHeader: (index: number, value: string) => void;
+    onUpdateTimelineDescription: (index: number, value: string) => void;
     onDeleteTimelineStep: (colIndex: number) => void;
     activeCell: { category: RequirementCategory | 'core' | 'timeline', rowIndex: number, colIndex: number } | null;
     onSelectCell: (category: RequirementCategory | 'core' | 'timeline', rowIndex: number, colIndex: number) => void;
@@ -132,7 +134,7 @@ const StoryboardCellView: React.FC<{
 }
 
 
-export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable, coreExperience, onUpdateCell, onClearCell, onUpdateCoreCell, onUpdateTimelineHeader, onDeleteTimelineStep, activeCell, onSelectCell, onGenerateTechImplementation }) => {
+export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, timelineDescriptions, gameTable, coreExperience, onUpdateCell, onClearCell, onUpdateCoreCell, onUpdateTimelineHeader, onUpdateTimelineDescription, onDeleteTimelineStep, activeCell, onSelectCell, onGenerateTechImplementation }) => {
     const { t } = useLanguage();
     const translatedCategories = t.categories;
 
@@ -153,8 +155,9 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
         <div className="flex-1 bg-gray-800 rounded-lg p-1 shadow-inner relative">
             <table className="w-full border-separate border-spacing-0">
                 <thead>
+                    {/* ROW 1: TITLES */}
                     <tr>
-                        <th className="sticky left-0 top-0 z-40 bg-gray-800 p-2 font-bold text-gray-400 border border-gray-700 min-w-[200px]">
+                        <th rowSpan={2} className="sticky left-0 top-0 z-40 bg-gray-800 p-2 font-bold text-gray-400 border border-gray-700 min-w-[200px] align-top">
                            {t.table.headerCorner}
                         </th>
                         {timeline.map((step, colIndex) => {
@@ -162,22 +165,49 @@ export const GameReqTable: React.FC<GameReqTableProps> = ({ timeline, gameTable,
                             return (
                                 <th 
                                     key={colIndex} 
-                                    className={`group sticky top-0 z-30 bg-gray-800 p-1 border border-gray-700 min-w-[250px] transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500' : ''}`}
+                                    className={`group sticky top-0 z-30 bg-gray-800 p-1 border border-gray-700 min-w-[250px] h-12 transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500' : ''}`}
                                     onClick={() => onSelectCell('timeline', 0, colIndex)}
                                 >
-                                     <div className="relative">
-                                        <EditableCell value={step} onSave={(val) => onUpdateTimelineHeader(colIndex, val)} isHeader />
+                                     <div className="relative flex items-center h-full">
+                                        <EditableCell
+                                            value={step}
+                                            onSave={(val) => onUpdateTimelineHeader(colIndex, val)}
+                                            isHeader
+                                            placeholder={t.table.placeholders.timelineTitle}
+                                        />
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onDeleteTimelineStep(colIndex);
                                             }}
-                                            className="absolute top-0 right-0 m-1 p-1 text-red-500 rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-500/20 focus:opacity-100 focus:outline-none transition-opacity"
+                                            className="absolute top-1/2 -translate-y-1/2 right-0 m-1 p-1 text-red-500 rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-500/20 focus:opacity-100 focus:outline-none transition-opacity"
                                             aria-label={t.table.placeholders.deleteStep.replace('{stepName}', step)}
                                         >
                                             <TrashIcon className="w-4 h-4" />
                                         </button>
                                      </div>
+                                </th>
+                            );
+                        })}
+                    </tr>
+                     {/* ROW 2: DESCRIPTIONS */}
+                    <tr>
+                        {timeline.map((_, colIndex) => {
+                            const isSelected = activeCell?.category === 'timeline' && activeCell?.colIndex === colIndex;
+                            return (
+                                <th
+                                    key={`desc-${colIndex}`}
+                                    className={`sticky z-30 bg-gray-800 p-1 border border-gray-700 min-w-[250px] h-24 transition-all cursor-pointer hover:bg-gray-700/30 ${isSelected ? 'ring-2 ring-purple-500' : ''}`}
+                                    style={{ top: '48px' }} // Height of first row (h-12 is 3rem/48px)
+                                    onClick={() => onSelectCell('timeline', 0, colIndex)}
+                                >
+                                    <EditableCell
+                                        value={timelineDescriptions[colIndex] || ''}
+                                        onSave={(val) => onUpdateTimelineDescription(colIndex, val)}
+                                        isHeader={false}
+                                        placeholder={t.table.placeholders.timelineDescription}
+                                        isTextarea={true}
+                                    />
                                 </th>
                             );
                         })}

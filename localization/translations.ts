@@ -29,6 +29,8 @@ export const translations = {
       coreExperience: 'Core Experience',
       placeholders: {
         description: 'Enter description or drop asset tag...',
+        timelineTitle: 'Enter step title...',
+        timelineDescription: 'Enter detailed step description for AI...',
         coreExperience: 'Describe experience or drop asset tag...',
         image: 'Select to generate an image',
         prompt: 'Enter image prompt...',
@@ -198,6 +200,8 @@ export const translations = {
       coreExperience: '核心体验',
       placeholders: {
         description: '输入描述或拖入资产标签...',
+        timelineTitle: '输入步骤标题...',
+        timelineDescription: '输入此步骤的详细描述 (用于AI生成)...',
         coreExperience: '描述体验或拖入资产标签...',
         image: '选择以生成图片',
         prompt: '输入图片提示词...',
