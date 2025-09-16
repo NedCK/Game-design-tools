@@ -66,3 +66,10 @@ export interface ReferenceImage {
   label: string;
   section: AssetSection;
 }
+
+export interface ArtConceptSegment {
+  id: string;
+  title: string; // S1, S2, ...
+  timelineRange: string; // User input like "2-4"
+  description: string;
+}

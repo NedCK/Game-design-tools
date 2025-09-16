@@ -204,7 +204,7 @@ Based on this, please provide a refined, more detailed description. The new desc
 export const generateImage = async (
     apiKey: string,
     prompt: string,
-    gameConcept: string,
+    artConceptDescription: string,
     referenceImages: ReferenceImage[]
 ): Promise<string> => {
     if (!apiKey) {
@@ -255,8 +255,8 @@ The user's prompt for the scene contains tags starting with '#', like '#Hero'. T
 **Reference Images Provided (linked to tags in the prompt):**
 ${referenceLabels}
 
-**Overall Game Concept (for style and mood):**
-${gameConcept || 'Not specified, but derive from the reference images and prompt.'}
+**Art & Game Concept for this specific scene (for style and mood):**
+${artConceptDescription || 'Not specified, but derive from the reference images and prompt.'}
 
 **User's prompt for this scene:**
 "${prompt}"
@@ -271,8 +271,8 @@ The final prompt MUST incorporate the visual style, character designs, and atmos
 **Reference Images Provided:**
 ${referenceLabels}
 
-**Overall Game Concept:**
-${gameConcept || 'Not specified, but derive from the reference images.'}
+**Art & Game Concept for this specific scene:**
+${artConceptDescription || 'Not specified, but derive from the reference images.'}
 
 **User's simple prompt for this scene:**
 "${prompt}"
@@ -294,8 +294,8 @@ Now, generate the detailed prompt. The prompt should be a single paragraph of de
         finalPrompt = enhancedPromptResponse.text;
     }
     
-    const conceptPreamble = gameConcept && imagesForEnhancement.length === 0
-        ? `First, strictly adhere to the following overall game concept design to ensure visual consistency. Game Concept: "${gameConcept}". `
+    const conceptPreamble = artConceptDescription && imagesForEnhancement.length === 0
+        ? `First, strictly adhere to the following overall game concept design to ensure visual consistency. Art & Game Concept: "${artConceptDescription}". `
         : '';
 
     const imageGenerationPrompt = imagesForEnhancement.length > 0 

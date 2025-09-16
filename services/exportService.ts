@@ -1,26 +1,33 @@
-
-
-
 import { GameTable, CoreExperienceRow, RequirementCategory } from '../types';
 import { translations } from '../localization/translations';
 
 const escapeCSV = (str: string): string => {
+    if (!str) return '';
     if (str.includes(',') || str.includes('"') || str.includes('\n')) {
         return `"${str.replace(/"/g, '""')}"`;
     }
     return str;
 };
 
-export const exportToCSV = (timeline: string[], gameTable: GameTable, coreExperience: CoreExperienceRow, t: typeof translations.en): void => {
+export const exportToCSV = (timeline: string[], timelineDescriptions: string[], gameTable: GameTable, coreExperience: CoreExperienceRow, t: typeof translations.en): void => {
     const BOM = '\uFEFF';
     const rows = [];
 
+    // Header Row 1: Timeline Step Titles
     const headers = [t.table.category, ...timeline.map(escapeCSV)];
     rows.push(headers.join(','));
+    
+    // Header Row 2: Timeline Step Descriptions
+    const descriptionRow = [t.table.timelineDescriptionHeader, ...timelineDescriptions.map(escapeCSV)];
+    rows.push(descriptionRow.join(','));
 
     Object.values(RequirementCategory).forEach(cat => {
         const catRows = gameTable[cat] || [];
-        catRows.forEach((row, rowIndex) => {
+        if (catRows.length === 0 && cat !== RequirementCategory.STORYBOARD) return; // Don't print empty categories unless it's storyboard
+
+        const printRows = catRows.length > 0 ? catRows : [{}]; // Ensure at least one row for storyboard even if empty
+
+        printRows.forEach((row, rowIndex) => {
             const rowData = [rowIndex === 0 ? t.categories[cat].name : ''];
             timeline.forEach((_, index) => {
                 const cell = row[index];
@@ -66,19 +73,28 @@ export const exportToCSV = (timeline: string[], gameTable: GameTable, coreExperi
 };
 
 const escapeMarkdown = (str: string): string => {
+    if (!str) return '';
     return str.replace(/\|/g, '\\|').replace(/\n/g, '<br/>');
 };
 
-export const exportToMarkdown = (timeline: string[], gameTable: GameTable, coreExperience: CoreExperienceRow, t: typeof translations.en): void => {
+export const exportToMarkdown = (timeline: string[], timelineDescriptions: string[], gameTable: GameTable, coreExperience: CoreExperienceRow, t: typeof translations.en): void => {
     let mdContent = `# Game Requirements Document\n\n`;
 
     const headers = [t.table.category, ...timeline.map(escapeMarkdown)];
+    const descriptionRow = [`**${t.table.timelineDescriptionHeader}**`, ...timelineDescriptions.map(escapeMarkdown)];
+
     mdContent += `| ${headers.join(' | ')} |\n`;
     mdContent += `| ${headers.map(() => '---').join(' | ')} |\n`;
+    mdContent += `| ${descriptionRow.join(' | ')} |\n`;
+
 
     Object.values(RequirementCategory).forEach(cat => {
         const catRows = gameTable[cat] || [];
-        catRows.forEach((row, rowIndex) => {
+        if (catRows.length === 0 && cat !== RequirementCategory.STORYBOARD) return;
+
+        const printRows = catRows.length > 0 ? catRows : [{}];
+
+        printRows.forEach((row, rowIndex) => {
             const rowData = [rowIndex === 0 ? `**${t.categories[cat].name}**` : ''];
             timeline.forEach((_, index) => {
                 const cell = row[index];

@@ -9,7 +9,7 @@ import { Notification } from './components/Notification';
 import { refineCellContent, getCoreExperienceAlignmentSuggestions, generateColumnRequirements, translateToChinese, consolidateUIRequirementsForColumn, generateImage, generateTechImplementation } from './services/geminiService';
 import { exportToCSV, exportToMarkdown } from './services/exportService';
 import * as dbService from './services/dbService';
-import { GameTable, CoreExperienceRow, ApiKey, AIProvider, RequirementCategory, NotificationMessage, RequirementRow, GameEngine, RequirementCell, ReferenceImage, AssetSection } from './types';
+import { GameTable, CoreExperienceRow, ApiKey, AIProvider, RequirementCategory, NotificationMessage, RequirementRow, GameEngine, RequirementCell, ReferenceImage, AssetSection, ArtConceptSegment } from './types';
 import { CATEGORY_STATIC_DETAILS } from './constants';
 import { useLanguage } from './contexts/LanguageContext';
 
@@ -67,7 +67,7 @@ const App: React.FC = () => {
     const [gameTable, setGameTable] = useState<GameTable>(generateInitialTable([]).table);
     const [coreExperience, setCoreExperience] = useState<CoreExperienceRow>(generateInitialTable([]).core);
     const [timelineDescriptions, setTimelineDescriptions] = useState<string[]>([]);
-    const [gameConcept, setGameConcept] = useState<string>('');
+    const [artConcepts, setArtConcepts] = useState<ArtConceptSegment[]>([]);
     const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
     const [aiSuggestions, setAiSuggestions] = useState<string>('');
     const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
@@ -88,19 +88,19 @@ const App: React.FC = () => {
             gameTable,
             coreExperience,
             timelineDescriptions,
-            gameConcept,
+            artConcepts,
             selectedEngine
         };
-    }, [timeline, gameTable, coreExperience, timelineDescriptions, gameConcept, selectedEngine]);
+    }, [timeline, gameTable, coreExperience, timelineDescriptions, artConcepts, selectedEngine]);
 
     const loadState = async (loadedData: any) => {
         if (!loadedData) return;
-        const { timeline, gameTable, coreExperience, timelineDescriptions, gameConcept, referenceImages, selectedEngine } = loadedData;
+        const { timeline, gameTable, coreExperience, timelineDescriptions, artConcepts, referenceImages, selectedEngine } = loadedData;
         if (timeline) setTimeline(timeline);
         if (gameTable) setGameTable(gameTable);
         if (coreExperience) setCoreExperience(coreExperience);
         if (timelineDescriptions) setTimelineDescriptions(timelineDescriptions);
-        if (gameConcept) setGameConcept(gameConcept);
+        if (artConcepts) setArtConcepts(artConcepts);
         if (selectedEngine) setSelectedEngine(selectedEngine);
 
         if (referenceImages && Array.isArray(referenceImages)) {
@@ -130,12 +130,13 @@ const App: React.FC = () => {
                      const { referenceImages: _, ...restOfState } = parsedState; // Explicitly ignore images from localStorage
                     loadState(restOfState);
                 } else {
-                     const initialTimeline = t.initialTimeline;
+                     const initialTimeline = t.initialTimeline.map((step, index) => `${index + 1}: ${step}`);
                      const { table, core } = generateInitialTable(initialTimeline);
                      setTimeline(initialTimeline);
                      setGameTable(table);
                      setCoreExperience(core);
                      setTimelineDescriptions(Array(initialTimeline.length).fill(''));
+                     setArtConcepts([{ id: crypto.randomUUID(), title: 'S1', timelineRange: `1-${initialTimeline.length}`, description: '' }]);
                 }
                 if (savedKeys) setApiKeys(JSON.parse(savedKeys));
             } catch (error) {
@@ -181,7 +182,7 @@ const App: React.FC = () => {
             saveStateToLocalStorage();
         }, 2000);
         return () => clearTimeout(handler);
-    }, [timeline, gameTable, coreExperience, timelineDescriptions, gameConcept, selectedEngine, apiKeys, saveStateToLocalStorage]);
+    }, [timeline, gameTable, coreExperience, timelineDescriptions, artConcepts, selectedEngine, apiKeys, saveStateToLocalStorage]);
 
     const handleSaveToFile = async () => {
         try {
@@ -291,8 +292,8 @@ const App: React.FC = () => {
     };
 
     const handleAddTimelineStep = () => {
-        const newStepName = `New Step ${timeline.length + 1}`;
         const newIndex = timeline.length;
+        const newStepName = `${newIndex + 1}: New Step`;
 
         setTimeline(prev => [...prev, newStepName]);
         setTimelineDescriptions(prev => [...prev, '']);
@@ -449,6 +450,29 @@ const App: React.FC = () => {
         }
     };
 
+    const handleAddArtConcept = () => {
+        setArtConcepts(prev => [
+            ...prev,
+            {
+                id: crypto.randomUUID(),
+                title: `S${prev.length + 1}`,
+                timelineRange: '',
+                description: ''
+            }
+        ]);
+    };
+
+    const handleUpdateArtConcept = (id: string, field: keyof Omit<ArtConceptSegment, 'id' | 'title'>, value: string) => {
+        setArtConcepts(prev => prev.map(segment => 
+            segment.id === id ? { ...segment, [field]: value } : segment
+        ));
+    };
+
+    const handleDeleteArtConcept = (id: string) => {
+        setArtConcepts(prev => prev.filter(segment => segment.id !== id));
+    };
+
+
     const handleGenerateColumnRequirements = async (timelineDescription: string) => {
         const apiKey = apiKeys.find(k => k.provider === selectedProvider)?.key;
         if (!apiKey) {
@@ -467,7 +491,7 @@ const App: React.FC = () => {
             const { colIndex } = activeCell;
             const timelineStepName = timeline[colIndex];
             
-            const result = await generateColumnRequirements(apiKey, gameConcept, timelineStepName, timelineDescription, t.categories as Record<RequirementCategory, {name: string}>, selectedEngine);
+            const result = await generateColumnRequirements(apiKey, "N/A", timelineStepName, timelineDescription, t.categories as Record<RequirementCategory, {name: string}>, selectedEngine);
             
             setGameTable(prev => {
                 const newTable = JSON.parse(JSON.stringify(prev));
@@ -675,8 +699,25 @@ const App: React.FC = () => {
         setIsLoading(true);
         setLoadingMessage('Generating storyboard image...');
         try {
-            const resultUrl = await generateImage(apiKey, prompt, gameConcept, referenceImages);
             const { category, rowIndex, colIndex } = activeCell;
+            const timelineColIndex = colIndex + 1; // 1-based index for ranges
+
+            const artConceptForStep = artConcepts.find(segment => {
+                const rangeParts = segment.timelineRange.replace(/\s/g, '').split('-').map(Number);
+                if (rangeParts.some(isNaN) || rangeParts.length === 0) return false;
+
+                if (rangeParts.length === 1) {
+                    return timelineColIndex === rangeParts[0];
+                }
+                if (rangeParts.length === 2) {
+                    return timelineColIndex >= rangeParts[0] && timelineColIndex <= rangeParts[1];
+                }
+                return false;
+            });
+            const artConceptDescription = artConceptForStep ? artConceptForStep.description : '';
+            
+            const resultUrl = await generateImage(apiKey, prompt, artConceptDescription, referenceImages);
+            
 
             setGameTable(prev => {
                 const newTable = { ...prev };
@@ -800,10 +841,10 @@ const App: React.FC = () => {
 
     const handleExport = (format: 'csv' | 'md') => {
         if (format === 'csv') {
-            exportToCSV(timeline, gameTable, coreExperience, t);
+            exportToCSV(timeline, timelineDescriptions, gameTable, coreExperience, t);
             setNotification({ type: 'success', message: t.notifications.exportedCSV });
         } else {
-            exportToMarkdown(timeline, gameTable, coreExperience, t);
+            exportToMarkdown(timeline, timelineDescriptions, gameTable, coreExperience, t);
             setNotification({ type: 'success', message: t.notifications.exportedMD });
         }
     };
@@ -866,8 +907,10 @@ const App: React.FC = () => {
                     />
                     <ReferenceImagePanel 
                         images={referenceImages}
-                        gameConcept={gameConcept}
-                        onUpdateGameConcept={setGameConcept}
+                        artConcepts={artConcepts}
+                        onAddArtConcept={handleAddArtConcept}
+                        onUpdateArtConcept={handleUpdateArtConcept}
+                        onDeleteArtConcept={handleDeleteArtConcept}
                         onCharacterUploadClick={() => handleReferenceImageUploadClick(AssetSection.CHARACTER)}
                         onSceneUploadClick={() => handleReferenceImageUploadClick(AssetSection.SCENE)}
                         onUpdateLabel={handleUpdateReferenceImageLabel}

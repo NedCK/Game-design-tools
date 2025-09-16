@@ -13,10 +13,16 @@ export const translations = {
       saveProject: 'Save Project',
       loadProject: 'Load Project',
     },
-    artAssetPanel: {
-      title: 'Art Asset Board',
-      conceptTitle: 'Overall Art Direction & Game Concept',
-      conceptPlaceholder: 'Describe the overall art style, mood, key characters, and setting of your game here. This will guide the AI in generating consistent storyboard images.',
+    artConceptPanel: {
+      title: 'Art & Concept Direction Board',
+      segmentsTitle: 'Direction Segments',
+      addSegment: 'Add Segment',
+      deleteSegment: 'Delete Segment',
+      segmentTitle: 'Segment',
+      timelineRange: 'Timeline Range (e.g., 2-4)',
+      rangeHelper: 'Applies to columns',
+      description: 'Art/Game Concept Description',
+      descriptionPlaceholder: 'Describe the art style, mood, and concept for this segment...',
       characters: 'Characters',
       scenes: 'Scenes',
       uploadButton: 'Upload Asset',
@@ -27,6 +33,7 @@ export const translations = {
     table: {
       headerCorner: 'Category ↓ / Timeline →',
       category: 'Category',
+      timelineDescriptionHeader: 'Description',
       reqIdRule: 'Req. ID Rule: [PREFIX]-[###]',
       coreExperience: 'Core Experience',
       placeholders: {
@@ -83,10 +90,10 @@ export const translations = {
       gameEngine: 'Game Engine',
       cancel: 'Cancel',
       save: 'Save',
-      viewUserGuide: 'View User Guide v1.0',
+      viewUserGuide: 'View User Guide v1.2',
       hideUserGuide: 'Hide User Guide',
       userGuide: {
-        title: 'User Guide (v1.0)',
+        title: 'User Guide (v1.2)',
         intro: {
           title: 'Introduction',
           content: 'Welcome to the AI Game Requirement Architect! This tool is designed to streamline the game design process by integrating AI to help you generate, refine, and manage your game requirement documents from a producer\'s perspective.'
@@ -94,21 +101,21 @@ export const translations = {
         gettingStarted: {
           title: '1. Getting Started',
           apiKey: '**Set API Key & Engine:** Click the settings icon to enter your AI provider API key (e.g., Google Gemini) and select your target game engine. This is essential for all AI functions.',
-          addStep: '**Add Timeline Steps:** Use the "+ Add Timeline Step" button to expand your game\'s flow.',
+          addStep: '**Add Timeline Steps:** Use the "+ Add Timeline Step" button to expand your game\'s flow. Steps are now auto-numbered.',
           editCells: '**Edit Content:** Click on any cell in the table to start typing. Your work is auto-saved locally.'
         },
         coreFeatures: {
           title: '2. Core AI Features',
-          generateColumn: '**Generate Column Requirements:** Select a timeline header (e.g., "Start Game"). Describe the events of that step in the AI Assistant panel on the right, and click "Generate Requirements" to have the AI populate the entire column with initial ideas.',
+          generateColumn: '**Generate Column Requirements:** Select a timeline header (e.g., "2: Start Game"). Describe the events of that step in the AI Assistant panel on the right, and click "Generate Requirements" to have the AI populate the entire column with initial ideas.',
           refineCell: '**Refine & Translate:** Select any individual requirement cell. The AI Assistant will show its content. You can then use the "Refine with AI" button to expand on the idea or "Translate" to convert it to Chinese.',
           consolidateUI: '**Consolidate UI System:** After generating requirements for a column, select any cell within the "UI System" row for that column. Then, click "Consolidate UI Requirements" in the AI Assistant. The AI will read all other requirements in that column and create a specific to-do list for the UI/UX team.',
-          generateStoryboard: '**Generate Storyboard:** Use the **Art Asset Board** to upload character/scene art and define an overall **Game Concept**. When you add a storyboard entry, you can write a prompt in the AI Assistant to generate a sketch. **Pro-Tip:** Use tags (e.g., \'#Hero\') that match your asset labels in your prompt to include specific characters or scenes. You can drag these tags from the Art Asset Board directly into the table cells. The AI combines the Game Concept, tagged assets, and your prompt for highly consistent images. Afterwards, you can click the sparkle icon within the cell to generate a technical implementation plan.',
+          generateStoryboard: '**Generate Storyboard:** This feature combines multiple sources for precise visual control. First, use the **Art & Concept Direction Board** to set up your visual styles. You can create multiple style segments (S1, S2...) and assign each to a specific timeline range (e.g., "2-4"). Also, upload character and scene assets. To generate an image: select a storyboard cell, write a prompt in the AI assistant, and click generate. The AI synthesizes three key inputs: **1. The Art Concept** for that timeline step\'s range, **2. Tagged Assets** (use tags like \'#Hero\' in your prompt that match asset labels to include specific visuals), and **3. Your Prompt Text**. This powerful combination ensures stylistic consistency while allowing for specific character and scene placement. You can drag asset tags from the panel into table cells for convenience. After generation, use the ✨ icon in the cell to create a technical implementation plan.',
           alignExperience: '**Align to Core Experience (Key Feature):** This is the most powerful feature. First, fill in the "Core Experience" row for a specific timeline step, describing the emotion or feeling you want the player to have (e.g., "A sense of wonder and discovery"). Then, select that Core Experience cell. In the AI Assistant, a new option will appear. Click "Get Alignment Suggestions" to receive detailed feedback on how to adjust the Narrative, Art, Interaction, Audio, and Storyboard descriptions in that column to better achieve your desired core experience.'
         },
         projectManagement: {
           title: '3. Project Management',
           saveLoad: '**Save/Load Project:** Use the "Save Project" and "Load Project" buttons to save your entire table to a local file (.json) and load it back in later. This is different from the automatic local browser storage.',
-          export: '**Export:** Use the "Export" button to save your table in user-friendly formats like CSV (for spreadsheets) or Markdown (for documents).'
+          export: '**Export:** Use the "Export" button to save your table in user-friendly formats like CSV (for spreadsheets) or Markdown (for documents). The export now includes timeline descriptions.'
         }
       }
     },
@@ -187,10 +194,16 @@ export const translations = {
       saveProject: '保存项目',
       loadProject: '加载项目',
     },
-    artAssetPanel: {
-      title: '美术资产看板',
-      conceptTitle: '整体美术指导 & 游戏概念',
-      conceptPlaceholder: '在此描述您游戏的整体美术风格、氛围、关键角色和设定。这将指导AI生成风格一致的分镜草图。',
+    artConceptPanel: {
+      title: '美术&游戏概念指导表',
+      segmentsTitle: '指导分段',
+      addSegment: '添加分段',
+      deleteSegment: '删除分段',
+      segmentTitle: '分段',
+      timelineRange: '时间轴区间 (例如: 2-4)',
+      rangeHelper: '应用于列',
+      description: '美术/游戏概念描述',
+      descriptionPlaceholder: '描述此分段的美术风格、氛围和概念...',
       characters: '人物角色',
       scenes: '场景',
       uploadButton: '上传资产',
@@ -201,6 +214,7 @@ export const translations = {
     table: {
       headerCorner: '分类 ↓ / 时间轴 →',
       category: '类别',
+      timelineDescriptionHeader: '描述',
       reqIdRule: '需求 ID 规则：[前缀]-[###]',
       coreExperience: '核心体验',
       placeholders: {
@@ -257,10 +271,10 @@ export const translations = {
       gameEngine: '游戏引擎',
       cancel: '取消',
       save: '保存',
-      viewUserGuide: '查看使用说明 (v1.0)',
+      viewUserGuide: '查看使用说明 (v1.2)',
       hideUserGuide: '隐藏使用说明',
       userGuide: {
-        title: '使用说明 (v1.0)',
+        title: '使用说明 (v1.2)',
         intro: {
           title: '引言',
           content: '欢迎使用 AI 游戏需求架构师！本工具旨在通过集成 AI，从游戏制作人的角度帮助您生成、优化和管理游戏需求文档，从而简化游戏设计流程。'
@@ -268,21 +282,21 @@ export const translations = {
         gettingStarted: {
           title: '1. 快速入门',
           apiKey: '**设置API密钥和引擎：** 点击设置图标，输入您的 AI 服务商 API 密钥（例如 Google Gemini），并选择您的目标游戏引擎。这是所有 AI 功能正常运作的基础。',
-          addStep: '**添加时间线步骤：** 使用“+ 添加时间线步骤”按钮来扩展您的游戏流程。',
+          addStep: '**添加时间线步骤：** 使用“+ 添加时间线步骤”按钮来扩展您的游戏流程。步骤现在会自动编号。',
           editCells: '**编辑内容：** 单击表格中的任何单元格即可开始输入。您的工作会自动保存在本地浏览器中。'
         },
         coreFeatures: {
           title: '2. 核心 AI 功能',
-          generateColumn: '**生成整列需求：** 选择一个时间线标题（例如，“开始游戏”）。在右侧的 AI 助手面板中描述该步骤中发生的事件，然后点击“生成需求”，AI 将会为整个列填充初步的想法。',
+          generateColumn: '**生成整列需求：** 选择一个时间线标题（例如，“2: 开始游戏”）。在右侧的 AI 助手面板中描述该步骤中发生的事件，然后点击“生成需求”，AI 将会为整个列填充初步的想法。',
           refineCell: '**优化和翻译单元格：** 选择任何一个独立的需求单元格。AI 助手将显示其内容。然后您可以使用“使用 AI 优化”按钮来扩展想法，或使用“翻译”按钮将其转换为中文。',
           consolidateUI: '**整合UI系统需求：** 在为某一列生成需求后，选择该列中“用户界面UI系统”行内的任意单元格。然后，在AI助手中点击“整合UI需求”。AI 将会读取该列中的所有其他需求，并为UI/UX团队创建一个具体的待办事项列表。',
-          generateStoryboard: '**生成游戏分镜：** 使用 **美术资产看板** 上传角色/场景美术图，并定义整体的 **游戏概念**。当您添加一个分镜条目后，可以在 AI 助手中编写提示词来生成一张草图。 **专业提示：** 在提示词中使用与您资产标签相匹配的标签（例如 \'#主角\'）来指定特定的角色或场景。您可以直接从美术资产看板将这些标签拖拽到表格单元格中。AI 会结合游戏概念、带标签的资产和您的提示词，生成高度风格一致的图片。之后，您可以点击单元格内的小图标来生成技术实现方案。',
+          generateStoryboard: '**生成游戏分镜：** 此功能结合多个信息源以实现精确的视觉控制。首先，使用 **美术&游戏概念指导表** 来设置您的视觉风格。您可以创建多个风格分段（S1, S2...），并将每个分段分配给特定的时间轴范围（例如，“2-4”）。同时，上传角色和场景资产。要生成图片：选择一个分镜单元格，在 AI 助手中编写提示词，然后点击生成。AI 会综合三个关键输入：**1. 该时间轴范围对应的美术概念**，**2. 带标签的资产**（在提示词中使用与资产标签匹配的 ‘#英雄’ 等标签来包含特定视觉元素），以及 **3. 您的提示词文本**。这种强大的组合在确保风格一致性的同时，也允许精确的角色和场景布局。为了方便，您可以从资产面板将资产标签拖到表格单元格中。生成图片后，使用单元格中的 ✨ 图标来创建技术实现方案。',
           alignExperience: '**对齐核心体验（核心功能）：** 这是最强大的功能。首先，为特定的时间线步骤填写“核心体验”行，描述您希望玩家拥有的情感或感觉（例如，“一种奇妙和发现的感觉”）。然后，选中那个核心体验单元格。在 AI 助手中会出现一个新选项，点击“获取对齐建议”，AI 会提供详细的反馈，告诉您如何调整该列中的叙事、美术、互动、音频和分镜描述，以更好地实现您期望的核心体验。'
         },
         projectManagement: {
           title: '3. 项目管理',
           saveLoad: '**保存/加载项目：** 使用“保存项目”和“加载项目”按钮，将您的整个表格保存到一个本地文件（.json）中，并在以后加载回来。这与自动的浏览器本地存储是不同的。',
-          export: '**导出：** 使用“导出”按钮，将您的表格保存为用户友好的格式，如 CSV（用于电子表格）或 Markdown（用于文档）。'
+          export: '**导出：** 使用“导出”按钮，将您的表格保存为用户-友好的格式，如 CSV（用于电子表格）或 Markdown（用于文档）。导出功能现在包含时间轴描述。'
         }
       }
     },

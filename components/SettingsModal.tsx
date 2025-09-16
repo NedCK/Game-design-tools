@@ -121,7 +121,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                     <li><ReactMarkdown>{t.settings.userGuide.coreFeatures.generateColumn}</ReactMarkdown></li>
                                     <li><ReactMarkdown>{t.settings.userGuide.coreFeatures.refineCell}</ReactMarkdown></li>
                                     <li><ReactMarkdown>{t.settings.userGuide.coreFeatures.consolidateUI}</ReactMarkdown></li>
-                                    <li><ReactMarkdown>{t.settings.userGuide.coreFeatures.generateStoryboard.replace('Reference Board', 'Art Asset Board')}</ReactMarkdown></li>
+                                    <li><ReactMarkdown>{t.settings.userGuide.coreFeatures.generateStoryboard}</ReactMarkdown></li>
                                     <li><ReactMarkdown>{t.settings.userGuide.coreFeatures.alignExperience}</ReactMarkdown></li>
                                 </ul>
 
