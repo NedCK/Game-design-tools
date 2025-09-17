@@ -213,7 +213,7 @@ export const ReferenceImagePanel: React.FC<ReferenceImagePanelProps> = ({ images
                                         <span key={img.id}
                                               draggable
                                               onDragStart={(e) => handleDragStart(e, img.label)}
-                                              className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs font-mono rounded-md cursor-grab active:cursor-grabbing hover:bg-blue-500/40 transition-colors"
+                                              className="px-3 py-1.5 bg-blue-500/20 text-blue-300 text-sm font-mono rounded-lg cursor-grab active:cursor-grabbing hover:bg-blue-500/40 transition-colors"
                                         >
                                             #{img.label}
                                         </span>
@@ -229,7 +229,7 @@ export const ReferenceImagePanel: React.FC<ReferenceImagePanelProps> = ({ images
                                          <span key={img.id}
                                               draggable
                                               onDragStart={(e) => handleDragStart(e, img.label)}
-                                              className="px-2 py-1 bg-green-500/20 text-green-300 text-xs font-mono rounded-md cursor-grab active:cursor-grabbing hover:bg-green-500/40 transition-colors"
+                                              className="px-3 py-1.5 bg-green-500/20 text-green-300 text-sm font-mono rounded-lg cursor-grab active:cursor-grabbing hover:bg-green-500/40 transition-colors"
                                         >
                                             #{img.label}
                                         </span>

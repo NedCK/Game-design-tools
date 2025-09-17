@@ -24,8 +24,7 @@ const TrashIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 
 // --- TYPES & CONSTANTS ---
 type AnchorPoint = 'top' | 'right' | 'bottom' | 'left';
-const TAG_WIDTH = 120; // Approximate width for anchor calculation
-const TAG_HEIGHT = 40; // Approximate height for anchor calculation
+const FALLBACK_DIMS = { width: 120, height: 32 };
 
 
 // --- COMPONENT PROPS ---
@@ -72,10 +71,8 @@ const DraggableTag: React.FC<{
             style={{ 
                 left: `${item.position.x}px`, 
                 top: `${item.position.y}px`,
-                width: `${TAG_WIDTH}px`,
-                height: `${TAG_HEIGHT}px`
             }}
-            className={`absolute px-3 py-2 rounded-lg shadow-md cursor-grab active:cursor-grabbing border ${TagStyles[item.type]} flex items-center justify-center group transition-transform
+            className={`absolute px-3 py-1.5 rounded-lg shadow-md cursor-grab active:cursor-grabbing border ${TagStyles[item.type]} flex items-center group transition-transform text-sm font-mono max-w-[220px]
                 ${isSelected ? 'ring-2 ring-purple-500' : ''}
                 ${isConnectionTarget ? 'ring-2 ring-blue-400 scale-105' : ''}
             `}
@@ -92,7 +89,7 @@ const DraggableTag: React.FC<{
                 }
             }}
         >
-            <span className="truncate text-center">{item.text}</span>
+            <span className="truncate">{item.text}</span>
             {/* Connection Anchors */}
             {isSelected && item.panel === 'refinement' && anchorPoints.map(anchor => (
                 <div
@@ -124,25 +121,29 @@ const DraggableTag: React.FC<{
 };
 
 // --- HELPER FUNCTIONS ---
-const getAnchorPosition = (item: ConceptBoardItem, anchor: AnchorPoint): { x: number; y: number } => {
+const getAnchorPosition = (item: ConceptBoardItem, anchor: AnchorPoint, dims: {width: number, height: number}): { x: number; y: number } => {
     const { x, y } = item.position;
+    const { width, height } = dims;
     switch (anchor) {
-        case 'top': return { x: x + TAG_WIDTH / 2, y };
-        case 'right': return { x: x + TAG_WIDTH, y: y + TAG_HEIGHT / 2 };
-        case 'bottom': return { x: x + TAG_WIDTH / 2, y: y + TAG_HEIGHT };
-        case 'left': return { x, y: y + TAG_HEIGHT / 2 };
+        case 'top': return { x: x + width / 2, y };
+        case 'right': return { x: x + width, y: y + height / 2 };
+        case 'bottom': return { x: x + width / 2, y: y + height };
+        case 'left': return { x, y: y + height / 2 };
     }
 };
 
-const findClosestAnchors = (itemA: ConceptBoardItem, itemB: ConceptBoardItem): { from: AnchorPoint, to: AnchorPoint } => {
+const findClosestAnchors = (itemA: ConceptBoardItem, itemB: ConceptBoardItem, dimsMap: Map<string, {width: number, height: number}>): { from: AnchorPoint, to: AnchorPoint } => {
     let minDistance = Infinity;
     let closestPair: { from: AnchorPoint, to: AnchorPoint } = { from: 'right', to: 'left' };
     const anchors: AnchorPoint[] = ['top', 'right', 'bottom', 'left'];
+    const dimsA = dimsMap.get(itemA.id) || FALLBACK_DIMS;
+    const dimsB = dimsMap.get(itemB.id) || FALLBACK_DIMS;
+
 
     for (const fromAnchor of anchors) {
         for (const toAnchor of anchors) {
-            const posA = getAnchorPosition(itemA, fromAnchor);
-            const posB = getAnchorPosition(itemB, toAnchor);
+            const posA = getAnchorPosition(itemA, fromAnchor, dimsA);
+            const posB = getAnchorPosition(itemB, toAnchor, dimsB);
             const distance = Math.sqrt(Math.pow(posA.x - posB.x, 2) + Math.pow(posA.y - posB.y, 2));
             if (distance < minDistance) {
                 minDistance = distance;
@@ -169,11 +170,12 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
     const [connectionTargetId, setConnectionTargetId] = useState<string | null>(null);
     const [editingPathDescription, setEditingPathDescription] = useState<ConceptPath | null>(null);
     const [pathDescription, setPathDescription] = useState('');
+    const [tagDimensions, setTagDimensions] = useState<Map<string, {width: number, height: number}>>(new Map());
 
     const inspirationItems = items.filter(item => item.panel === 'inspiration');
     const refinementItems = items.filter(item => item.panel === 'refinement');
 
-    const pathStartPoints = new Set(paths.map(p => p.tagIds[0]));
+    const pathStartPoints = new Set(paths.flatMap(p => p.tagIds.slice(0, -1)));
     const pathEndPoints = new Set(paths.map(p => p.tagIds[p.tagIds.length - 1]));
 
     const selectedItemIsEndpoint = selectedItemId ? pathEndPoints.has(selectedItemId) && !pathStartPoints.has(selectedItemId) : false;
@@ -200,6 +202,37 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
             setPathDescription(editingPathDescription.description);
         }
     }, [editingPathDescription]);
+    
+    useEffect(() => {
+        const observer = new ResizeObserver(entries => {
+            setTagDimensions(prevDims => {
+                const newDims = new Map(prevDims);
+                let hasChanged = false;
+                for (const entry of entries) {
+                    const id = (entry.target as HTMLElement).dataset.itemId;
+                    if (id) {
+                        const { inlineSize: width, blockSize: height } = entry.borderBoxSize[0];
+                        const oldDim = newDims.get(id);
+                        if (!oldDim || oldDim.width !== width || oldDim.height !== height) {
+                            newDims.set(id, { width, height });
+                            hasChanged = true;
+                        }
+                    }
+                }
+                return hasChanged ? newDims : prevDims;
+            });
+        });
+
+        const panel = refinementPanelRef.current;
+        if (panel) {
+            const tags = panel.querySelectorAll<HTMLElement>('[data-item-id]');
+            tags.forEach(tag => observer.observe(tag));
+        }
+        
+        return () => {
+            observer.disconnect();
+        };
+    }, [refinementItems]);
 
 
     const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>, panel: 'inspiration' | 'refinement') => {
@@ -249,9 +282,12 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
         if (!data) return;
 
         const rect = panelRef.current.getBoundingClientRect();
+        // Dropping will be inexact because tag width is dynamic. Let's estimate.
+        const estimatedWidth = 100;
+        const estimatedHeight = 28;
         const position = { 
-            x: e.clientX - rect.left - (TAG_WIDTH / 2), 
-            y: e.clientY - rect.top - (TAG_HEIGHT / 2) 
+            x: e.clientX - rect.left - (estimatedWidth / 2), 
+            y: e.clientY - rect.top - (estimatedHeight / 2) 
         };
 
         try {
@@ -306,13 +342,14 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
 
             if (currentTargetId) {
                 const targetItem = refinementItems.find(i => i.id === currentTargetId);
+                const targetDims = tagDimensions.get(currentTargetId) || FALLBACK_DIMS;
                 if (targetItem) {
                     let minDistance = Infinity;
                     let closestAnchorPos = newPos;
                     const anchors: AnchorPoint[] = ['top', 'right', 'bottom', 'left'];
 
                     for (const anchor of anchors) {
-                        const anchorPos = getAnchorPosition(targetItem, anchor);
+                        const anchorPos = getAnchorPosition(targetItem, anchor, targetDims);
                         const distance = Math.sqrt(Math.pow(anchorPos.x - newPos.x, 2) + Math.pow(anchorPos.y - newPos.y, 2));
                         if (distance < minDistance) {
                             minDistance = distance;
@@ -377,9 +414,9 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
             const endItem = itemMap.get(path.tagIds[1]);
             if (!startItem || !endItem || startItem.panel !== 'refinement' || endItem.panel !== 'refinement') return null;
 
-            const { from, to } = findClosestAnchors(startItem, endItem);
-            const startPos = getAnchorPosition(startItem, from);
-            const endPos = getAnchorPosition(endItem, to);
+            const { from, to } = findClosestAnchors(startItem, endItem, tagDimensions);
+            const startPos = getAnchorPosition(startItem, from, tagDimensions.get(startItem.id) || FALLBACK_DIMS);
+            const endPos = getAnchorPosition(endItem, to, tagDimensions.get(endItem.id) || FALLBACK_DIMS);
 
             return (
                 <g key={path.id}>
@@ -394,7 +431,7 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
         const startItem = items.find(i => i.id === connectingState.fromId);
         if (!startItem) return null;
 
-        const startPos = getAnchorPosition(startItem, connectingState.fromAnchor);
+        const startPos = getAnchorPosition(startItem, connectingState.fromAnchor, tagDimensions.get(startItem.id) || FALLBACK_DIMS);
         return <line x1={startPos.x} y1={startPos.y} x2={connectingState.toPosition.x} y2={connectingState.toPosition.y} stroke="#a855f7" strokeWidth="2" strokeDasharray="5,5" markerEnd="url(#preview-arrow)" />
     };
 
@@ -404,14 +441,16 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
         const finalTagId = editingPathDescription.tagIds[editingPathDescription.tagIds.length - 1];
         const finalTag = items.find(item => item.id === finalTagId);
         if (!finalTag) return null;
+        const finalTagDims = tagDimensions.get(finalTagId) || FALLBACK_DIMS;
+
 
         return (
             <div 
                 style={{ 
-                    left: `${finalTag.position.x + TAG_WIDTH / 2}px`, 
-                    top: `${finalTag.position.y + TAG_HEIGHT + 10}px` 
+                    left: `${finalTag.position.x}px`, 
+                    top: `${finalTag.position.y + finalTagDims.height + 10}px` 
                 }} 
-                className="absolute -translate-x-1/2 bg-gray-800 p-2 rounded-lg shadow-2xl border border-purple-500 z-50 flex flex-col gap-2"
+                className="absolute bg-gray-800 p-2 rounded-lg shadow-2xl border border-purple-500 z-50 flex flex-col gap-2"
                 onClick={e => e.stopPropagation()}
             >
                 <input
@@ -443,16 +482,17 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
                 const finalTagId = path.tagIds[path.tagIds.length - 1];
                 const finalTag = itemMap.get(finalTagId);
                 if (!finalTag) return null;
+                const finalTagDims = tagDimensions.get(finalTagId) || FALLBACK_DIMS;
 
                 return (
                     <div
                         key={`desc-${path.id}`}
                         style={{
-                            left: `${finalTag.position.x + TAG_WIDTH / 2}px`,
-                            top: `${finalTag.position.y + TAG_HEIGHT + 5}px`,
-                            maxWidth: `${TAG_WIDTH * 1.5}px`
+                            left: `${finalTag.position.x}px`,
+                            top: `${finalTag.position.y + finalTagDims.height + 5}px`,
+                            maxWidth: `200px`
                         }}
-                        className="absolute -translate-x-1/2 p-2 bg-gray-700 text-xs text-gray-200 rounded-md shadow-lg border border-gray-600 pointer-events-none"
+                        className="absolute p-2 bg-gray-700 text-xs text-gray-200 rounded-md shadow-lg border border-gray-600 pointer-events-none"
                     >
                         {path.description}
                     </div>
