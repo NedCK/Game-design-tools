@@ -38,7 +38,7 @@ const DraggableTag: React.FC<{
 }> = ({ item, isConnectingFrom, onStartConnection, isSelected, onClick, showConnectionDot }) => {
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-        e.dataTransfer.setData('application/json', JSON.stringify({ type: 'inspiration-tag', id: item.id }));
+        e.dataTransfer.setData('aigamearchitect/json', JSON.stringify({ type: 'inspiration-tag', id: item.id }));
         e.dataTransfer.effectAllowed = 'move';
     };
     
@@ -120,7 +120,7 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
     
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
+        e.dataTransfer.dropEffect = 'copy';
     };
 
     const handleDrop = (e: React.DragEvent, panel: 'inspiration' | 'refinement') => {
@@ -128,7 +128,7 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
         const panelRef = panel === 'inspiration' ? inspirationPanelRef : refinementPanelRef;
         if (!panelRef.current) return;
         
-        const data = e.dataTransfer.getData('application/json');
+        const data = e.dataTransfer.getData('aigamearchitect/json');
         if (!data) return;
 
         const rect = panelRef.current.getBoundingClientRect();

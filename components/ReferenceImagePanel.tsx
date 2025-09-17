@@ -122,9 +122,10 @@ export const ReferenceImagePanel: React.FC<ReferenceImagePanelProps> = ({ images
     const sceneImages = images.filter(img => img.section === AssetSection.SCENE);
 
     const handleDragStart = (e: React.DragEvent<HTMLSpanElement>, label: string) => {
+        // Data for components that accept plain text (like the main table)
         e.dataTransfer.setData('text/plain', `#${label}`);
-        // Add specific data for our app to identify this as an asset tag
-        e.dataTransfer.setData('application/json', JSON.stringify({ type: 'asset-tag', label }));
+        // Use a custom data type for the concept board to ensure reliable data transfer
+        e.dataTransfer.setData('aigamearchitect/json', JSON.stringify({ type: 'asset-tag', label }));
         e.dataTransfer.effectAllowed = 'copy';
     };
 
