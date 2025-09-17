@@ -9,6 +9,13 @@ const EditIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
+const AddCommentIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.455.09-.934.09-1.425v-2.288a2.25 2.25 0 0 1 2.25-2.25h3.818c.955 0 1.844.202 2.625.562a2.246 2.246 0 0 0 .332-1.31c0-.62-.504-1.125-1.125-1.125h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5c0-.621.504-1.125 1.125-1.125H15M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+    </svg>
+);
+
+
 const TrashIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
     <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.124-2.033-2.124H8.033c-1.12 0-2.033.944-2.033 2.124v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -39,10 +46,12 @@ const DraggableTag: React.FC<{
     isSelected: boolean;
     isConnecting: boolean;
     isConnectionTarget: boolean;
+    isPathEndpoint: boolean;
     onClick: (e: React.MouseEvent) => void;
     onStartConnection: (itemId: string, anchor: AnchorPoint, e: React.MouseEvent) => void;
+    onFinalizePath: () => void;
     onSetConnectionTarget?: (itemId: string | null) => void;
-}> = ({ item, isSelected, isConnecting, isConnectionTarget, onClick, onStartConnection, onSetConnectionTarget }) => {
+}> = ({ item, isSelected, isConnecting, isConnectionTarget, isPathEndpoint, onClick, onStartConnection, onFinalizePath, onSetConnectionTarget }) => {
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
         e.dataTransfer.setData('aigamearchitect/json', JSON.stringify({ type: 'board-item', id: item.id }));
@@ -84,6 +93,7 @@ const DraggableTag: React.FC<{
             }}
         >
             <span className="truncate text-center">{item.text}</span>
+            {/* Connection Anchors */}
             {isSelected && item.panel === 'refinement' && anchorPoints.map(anchor => (
                 <div
                     key={anchor}
@@ -96,6 +106,19 @@ const DraggableTag: React.FC<{
                     `}
                 />
             ))}
+            {/* Finalize Path Button */}
+            {isSelected && isPathEndpoint && (
+                 <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onFinalizePath();
+                    }}
+                    className="absolute -right-3 -top-3 p-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-500 shadow-lg transition-all"
+                    title="Add/Edit Path Description"
+                >
+                    <AddCommentIcon className="w-4 h-4" />
+                </button>
+            )}
         </div>
     );
 };
@@ -144,41 +167,47 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
     const [connectingState, setConnectingState] = useState<{ fromId: string; fromAnchor: AnchorPoint; toPosition: { x: number; y: number } } | null>(null);
     const [isConnecting, setIsConnecting] = useState(false);
     const [connectionTargetId, setConnectionTargetId] = useState<string | null>(null);
-    const [pathCreationState, setPathCreationState] = useState<{ fromId: string; toId: string } | null>(null);
+    const [editingPathDescription, setEditingPathDescription] = useState<ConceptPath | null>(null);
     const [pathDescription, setPathDescription] = useState('');
 
     const inspirationItems = items.filter(item => item.panel === 'inspiration');
     const refinementItems = items.filter(item => item.panel === 'refinement');
+
+    const pathStartPoints = new Set(paths.map(p => p.tagIds[0]));
+    const pathEndPoints = new Set(paths.map(p => p.tagIds[p.tagIds.length - 1]));
+
+    const selectedItemIsEndpoint = selectedItemId ? pathEndPoints.has(selectedItemId) && !pathStartPoints.has(selectedItemId) : false;
     
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Delete' && selectedItemId && !pathCreationState) {
+            if (e.key === 'Delete' && selectedItemId && !editingPathDescription) {
                 onDeleteItem(selectedItemId);
                 setSelectedItemId(null);
             } else if (e.key === 'Escape') {
                 setSelectedItemId(null);
                 setConnectingState(null);
                 setIsConnecting(false);
-                setPathCreationState(null);
+                setEditingPathDescription(null);
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedItemId, onDeleteItem, pathCreationState]);
+    }, [selectedItemId, onDeleteItem, editingPathDescription]);
     
     useEffect(() => {
-        if (pathCreationState) {
-            setPathDescription('');
+        if (editingPathDescription) {
+            setPathDescription(editingPathDescription.description);
         }
-    }, [pathCreationState]);
+    }, [editingPathDescription]);
 
 
     const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>, panel: 'inspiration' | 'refinement') => {
         const panelRef = panel === 'inspiration' ? inspirationPanelRef : refinementPanelRef;
-        if (e.target !== panelRef.current || pathCreationState) return;
+        if (e.target !== panelRef.current || editingPathDescription) return;
         
         setSelectedItemId(null);
+        setEditingPathDescription(null);
 
         if (panel === 'inspiration') {
             const rect = panelRef.current!.getBoundingClientRect();
@@ -303,9 +332,12 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
             window.removeEventListener('mouseup', handleMouseUp);
             
             const targetItemId = connectionTargetIdRef.current;
-
+            
             if (targetItemId && targetItemId !== fromId) {
-                setPathCreationState({ fromId, toId: targetItemId });
+                onAddPath({
+                    tagIds: [fromId, targetItemId],
+                    description: ''
+                });
             }
             
             setIsConnecting(false);
@@ -317,25 +349,23 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
         window.addEventListener('mouseup', handleMouseUp);
     };
 
-    const handleConfirmPathCreation = (description: string) => {
-        if (pathCreationState) {
-            onAddPath({
-                tagIds: [pathCreationState.fromId, pathCreationState.toId],
-                description: description || ''
-            });
+    const handleFinalizePath = () => {
+        if (!selectedItemId) return;
+        const pathToEnd = paths.find(p => p.tagIds[p.tagIds.length - 1] === selectedItemId);
+        if (pathToEnd) {
+            setEditingPathDescription(pathToEnd);
         }
-        setPathCreationState(null);
-    };
-    
-    const handleCancelPathCreation = () => {
-        setPathCreationState(null);
     };
 
-    const handleEditPathDescription = (path: ConceptPath) => {
-        const newDescription = prompt(t.conceptBoard.descriptionPlaceholder, path.description);
-        if (newDescription !== null && newDescription !== path.description) {
-            onUpdatePath({ ...path, description: newDescription });
+    const handleConfirmPathDescription = () => {
+        if (editingPathDescription) {
+            onUpdatePath({ ...editingPathDescription, description: pathDescription });
         }
+        setEditingPathDescription(null);
+    };
+    
+    const handleCancelPathDescription = () => {
+        setEditingPathDescription(null);
     };
     
     const renderPaths = () => {
@@ -350,24 +380,10 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
             const { from, to } = findClosestAnchors(startItem, endItem);
             const startPos = getAnchorPosition(startItem, from);
             const endPos = getAnchorPosition(endItem, to);
-            
-            const midX = (startPos.x + endPos.x) / 2;
-            const midY = (startPos.y + endPos.y) / 2;
 
             return (
-                <g key={path.id} className="group">
+                <g key={path.id}>
                     <line x1={startPos.x} y1={startPos.y} x2={endPos.x} y2={endPos.y} stroke="#6d28d9" strokeWidth="2" markerEnd="url(#arrow)" />
-                    <foreignObject x={midX - 75} y={midY - 25} width="150" height="50" className="overflow-visible">
-                        <div className="w-full h-full flex items-center justify-center pointer-events-none">
-                            <div className="bg-gray-700 p-1 rounded-md text-xs text-gray-300 border border-gray-600 shadow-lg text-center opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                {path.description}
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 flex gap-1 opacity-0 group-hover:opacity-100 pointer-events-auto">
-                                    <button onClick={() => handleEditPathDescription(path)} className="p-1 bg-blue-600 text-white rounded-full hover:bg-blue-500 shadow-sm"><EditIcon className="w-3 h-3" /></button>
-                                    <button onClick={() => onDeletePath(path.id)} className="p-1 bg-red-600 text-white rounded-full hover:bg-red-500 shadow-sm"><TrashIcon className="w-3 h-3" /></button>
-                                </div>
-                            </div>
-                        </div>
-                    </foreignObject>
                 </g>
             );
         });
@@ -382,25 +398,20 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
         return <line x1={startPos.x} y1={startPos.y} x2={connectingState.toPosition.x} y2={connectingState.toPosition.y} stroke="#a855f7" strokeWidth="2" strokeDasharray="5,5" markerEnd="url(#preview-arrow)" />
     };
 
-    const renderPathCreationForm = () => {
-        if (!pathCreationState) return null;
+    const renderPathDescriptionForm = () => {
+        if (!editingPathDescription) return null;
 
-        const itemMap = new Map(items.map(item => [item.id, item]));
-        const startItem = itemMap.get(pathCreationState.fromId);
-        const endItem = itemMap.get(pathCreationState.toId);
+        const finalTagId = editingPathDescription.tagIds[editingPathDescription.tagIds.length - 1];
+        const finalTag = items.find(item => item.id === finalTagId);
+        if (!finalTag) return null;
 
-        if (!startItem || !endItem) return null;
-        
-        const { from, to } = findClosestAnchors(startItem, endItem);
-        const startPos = getAnchorPosition(startItem, from);
-        const endPos = getAnchorPosition(endItem, to);
-        const midX = (startPos.x + endPos.x) / 2;
-        const midY = (startPos.y + endPos.y) / 2;
-        
         return (
             <div 
-                style={{ left: `${midX}px`, top: `${midY}px` }} 
-                className="absolute -translate-x-1/2 -translate-y-1/2 bg-gray-800 p-2 rounded-lg shadow-2xl border border-purple-500 z-50 flex flex-col gap-2"
+                style={{ 
+                    left: `${finalTag.position.x + TAG_WIDTH / 2}px`, 
+                    top: `${finalTag.position.y + TAG_HEIGHT + 10}px` 
+                }} 
+                className="absolute -translate-x-1/2 bg-gray-800 p-2 rounded-lg shadow-2xl border border-purple-500 z-50 flex flex-col gap-2"
                 onClick={e => e.stopPropagation()}
             >
                 <input
@@ -411,16 +422,42 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
                     placeholder={t.conceptBoard.descriptionPlaceholder}
                     className="bg-gray-700 border border-gray-600 rounded p-1 text-white outline-none text-sm w-48"
                     onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleConfirmPathCreation(e.currentTarget.value);
-                        if (e.key === 'Escape') handleCancelPathCreation();
+                        if (e.key === 'Enter') handleConfirmPathDescription();
+                        if (e.key === 'Escape') handleCancelPathDescription();
                     }}
                 />
                 <div className="flex justify-end gap-2">
-                     <button onClick={handleCancelPathCreation} className="px-2 py-1 text-xs bg-gray-600 rounded hover:bg-gray-500">{t.conceptBoard.cancelPath}</button>
-                     <button onClick={() => handleConfirmPathCreation(pathDescription)} className="px-2 py-1 text-xs bg-purple-600 rounded hover:bg-purple-500">{t.conceptBoard.confirmPath}</button>
+                     <button onClick={handleCancelPathDescription} className="px-2 py-1 text-xs bg-gray-600 rounded hover:bg-gray-500">{t.conceptBoard.cancelPath}</button>
+                     <button onClick={handleConfirmPathDescription} className="px-2 py-1 text-xs bg-purple-600 rounded hover:bg-purple-500">{t.conceptBoard.confirmPath}</button>
                 </div>
             </div>
         );
+    };
+
+    const renderPathDescriptions = () => {
+        const itemMap = new Map(items.map(item => [item.id, item]));
+
+        return paths
+            .filter(path => path.description && path.description.trim() !== '')
+            .map(path => {
+                const finalTagId = path.tagIds[path.tagIds.length - 1];
+                const finalTag = itemMap.get(finalTagId);
+                if (!finalTag) return null;
+
+                return (
+                    <div
+                        key={`desc-${path.id}`}
+                        style={{
+                            left: `${finalTag.position.x + TAG_WIDTH / 2}px`,
+                            top: `${finalTag.position.y + TAG_HEIGHT + 5}px`,
+                            maxWidth: `${TAG_WIDTH * 1.5}px`
+                        }}
+                        className="absolute -translate-x-1/2 p-2 bg-gray-700 text-xs text-gray-200 rounded-md shadow-lg border border-gray-600 pointer-events-none"
+                    >
+                        {path.description}
+                    </div>
+                );
+            });
     };
 
     return (
@@ -442,11 +479,13 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
                                 isSelected={selectedItemId === item.id}
                                 isConnecting={isConnecting}
                                 isConnectionTarget={false}
+                                isPathEndpoint={false}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedItemId(item.id);
                                 }}
                                 onStartConnection={() => {}}
+                                onFinalizePath={() => {}}
                             />
                         ))}
                          {tempInput && (
@@ -481,6 +520,7 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
                             {renderPaths()}
                             {renderConnectionPreview()}
                         </svg>
+                        {renderPathDescriptions()}
                         {refinementItems.map(item => (
                             <DraggableTag 
                                 key={item.id} 
@@ -488,15 +528,17 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
                                 isSelected={selectedItemId === item.id}
                                 isConnecting={isConnecting}
                                 isConnectionTarget={connectionTargetId === item.id && connectingState?.fromId !== item.id}
+                                isPathEndpoint={selectedItemIsEndpoint && selectedItemId === item.id}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedItemId(item.id);
                                 }}
                                 onStartConnection={handleStartConnection}
                                 onSetConnectionTarget={handleSetConnectionTarget}
+                                onFinalizePath={handleFinalizePath}
                             />
                         ))}
-                        {renderPathCreationForm()}
+                        {renderPathDescriptionForm()}
                      </div>
                 </div>
             </div>
