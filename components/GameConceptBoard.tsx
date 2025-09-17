@@ -81,6 +81,7 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
     const [newPathTags, setNewPathTags] = useState<string[]>([]);
     const [editingPath, setEditingPath] = useState<{id: string, description: string} | null>(null);
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+    const [isPanelHovered, setIsPanelHovered] = useState<'inspiration' | 'refinement' | null>(null);
 
     // Effect for handling delete key press
     useEffect(() => {
@@ -114,21 +115,32 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
     };
 
     const handleAddInspirationTag = (text: string) => {
-        if (!text.trim() || !tempInput) return;
-        onAddItem({ text: text.trim(), position: tempInput, type: 'inspiration', panel: 'inspiration' });
-        setTempInput(null);
+        if (tempInput) { // Only do something if an input is active
+            if (text.trim()) { // If there's text, add the item
+                onAddItem({ text: text.trim(), position: tempInput, type: 'inspiration', panel: 'inspiration' });
+            }
+        }
+        setTempInput(null); // Always close the input box after the action (blur or enter)
     };
     
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
-        // By not setting dropEffect, we let the browser use the value
-        // from effectAllowed set in onDragStart. Forcing a single value
-        // like 'copy' created a conflict when dragging items with
-        // effectAllowed set to 'move', preventing them from being dropped.
+    };
+
+    const handlePanelDragEnter = (panel: 'inspiration' | 'refinement') => {
+        setIsPanelHovered(panel);
+    };
+
+    const handleContainerDragLeave = (e: React.DragEvent) => {
+        // Only deactivate if the mouse is truly leaving the container for an external element
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            setIsPanelHovered(null);
+        }
     };
 
     const handleDrop = (e: React.DragEvent, panel: 'inspiration' | 'refinement') => {
         e.preventDefault();
+        setIsPanelHovered(null); // Reset highlight on drop
         const panelRef = panel === 'inspiration' ? inspirationPanelRef : refinementPanelRef;
         if (!panelRef.current) return;
         
@@ -220,12 +232,15 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
     return (
         <div className="bg-gray-800 rounded-lg p-4 shadow-inner mb-4 flex flex-col gap-6">
             <h3 className="text-lg font-bold text-purple-300 border-b border-gray-700 pb-3">{t.conceptBoard.title}</h3>
-            <div className="grid grid-cols-2 gap-4 h-[400px]">
+            <div className="grid grid-cols-2 gap-4 h-[400px]" onDragLeave={handleContainerDragLeave}>
                 {/* Inspiration Panel */}
-                <div className="bg-gray-900/50 p-3 rounded-lg border border-gray-700 relative" >
+                <div 
+                    className={`bg-gray-900/50 p-3 rounded-lg border relative transition-all duration-200 ease-in-out ${isPanelHovered === 'inspiration' ? 'scale-[1.02] border-purple-500 shadow-lg shadow-purple-900/50' : 'border-gray-700'}`}
+                    onDragEnter={() => handlePanelDragEnter('inspiration')}
+                >
                     <h4 className="font-semibold text-gray-300">{t.conceptBoard.inspirationTitle}</h4>
                     <p className="text-xs text-gray-500 mb-2">{t.conceptBoard.inspirationHelp}</p>
-                    <div ref={inspirationPanelRef} className="absolute inset-0 top-12" onClick={handleInspirationClick} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, 'inspiration')}>
+                    <div ref={inspirationPanelRef} className="absolute inset-0 top-12 cursor-text" onClick={handleInspirationClick} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, 'inspiration')}>
                         {inspirationItems.map(item => (
                             <DraggableTag
                                 key={item.id}
@@ -253,7 +268,10 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
                     </div>
                 </div>
                 {/* Refinement Panel */}
-                <div className="bg-gray-900/50 p-3 rounded-lg border border-gray-700 relative">
+                <div
+                    className={`bg-gray-900/50 p-3 rounded-lg border relative transition-all duration-200 ease-in-out ${isPanelHovered === 'refinement' ? 'scale-[1.02] border-purple-500 shadow-lg shadow-purple-900/50' : 'border-gray-700'}`}
+                    onDragEnter={() => handlePanelDragEnter('refinement')}
+                >
                      <h4 className="font-semibold text-gray-300">{t.conceptBoard.refinementTitle}</h4>
                     <p className="text-xs text-gray-500 mb-2">{t.conceptBoard.refinementHelp}</p>
                      <div ref={refinementPanelRef} className="absolute inset-0 top-12" onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, 'refinement')}>
