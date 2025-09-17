@@ -123,6 +123,8 @@ export const ReferenceImagePanel: React.FC<ReferenceImagePanelProps> = ({ images
 
     const handleDragStart = (e: React.DragEvent<HTMLSpanElement>, label: string) => {
         e.dataTransfer.setData('text/plain', `#${label}`);
+        // Add specific data for our app to identify this as an asset tag
+        e.dataTransfer.setData('application/json', JSON.stringify({ type: 'asset-tag', label }));
         e.dataTransfer.effectAllowed = 'copy';
     };
 

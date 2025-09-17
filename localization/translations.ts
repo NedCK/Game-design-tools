@@ -30,6 +30,18 @@ export const translations = {
       deleteLabel: 'Delete asset',
       tagsTitle: 'Asset Tags (Drag to use)',
     },
+    conceptBoard: {
+      title: 'Game Concept Board',
+      inspirationTitle: 'Inspiration Board',
+      inspirationHelp: 'Click anywhere to add an idea. Drag ideas to the refinement board.',
+      refinementTitle: 'Refinement Board',
+      refinementHelp: 'Drag inspiration and asset tags here to connect them into gameplay concepts.',
+      confirmPath: 'Confirm Path',
+      cancelPath: 'Cancel',
+      editPath: 'Edit',
+      deletePath: 'Delete',
+      descriptionPlaceholder: 'Enter a description for this connection...',
+    },
     table: {
       headerCorner: 'Category ↓ / Timeline →',
       category: 'Category',
@@ -148,6 +160,9 @@ export const translations = {
       projectLoadFailed: 'Failed to load project file. It might be corrupt or in the wrong format.',
       confirmDeleteStep: 'Are you sure you want to delete the step "{stepName}"? This action cannot be undone.',
       stepDeleted: 'Timeline step deleted successfully!',
+      pathCreated: 'Concept path created!',
+      pathUpdated: 'Concept path updated!',
+      pathDeleted: 'Concept path deleted!',
     },
     categories: {
       STORY: {
@@ -210,6 +225,18 @@ export const translations = {
       placeholder: '将资产上传到分区。',
       deleteLabel: '删除资产',
       tagsTitle: '资产标签 (可拖拽使用)',
+    },
+    conceptBoard: {
+      title: '游戏构思画板',
+      inspirationTitle: '灵感画板',
+      inspirationHelp: '在任意位置点击以添加灵感。可将灵感拖拽至精炼画板。',
+      refinementTitle: '精炼画板',
+      refinementHelp: '在此处拖拽灵感与资产标签，将它们连接成游戏玩法概念。',
+      confirmPath: '确认路径',
+      cancelPath: '取消',
+      editPath: '编辑',
+      deletePath: '删除',
+      descriptionPlaceholder: '为这条连接输入描述...',
     },
     table: {
       headerCorner: '分类 ↓ / 时间轴 →',
@@ -329,6 +356,9 @@ export const translations = {
       projectLoadFailed: '加载项目文件失败。文件可能已损坏或格式不正确。',
       confirmDeleteStep: '您确定要删除步骤 “{stepName}” 吗？此操作无法撤销。',
       stepDeleted: '时间线步骤已成功删除！',
+      pathCreated: '概念路径已创建！',
+      pathUpdated: '概念路径已更新！',
+      pathDeleted: '概念路径已删除！',
     },
     categories: {
       STORY: {

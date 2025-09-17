@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Header } from './components/Header';
 import { Toolbar } from './components/Toolbar';
 import { ReferenceImagePanel } from './components/ReferenceImagePanel';
+import { GameConceptBoard } from './components/GameConceptBoard';
 import { GameReqTable } from './components/GameReqTable';
 import { AIPanel } from './components/AIPanel';
 import { SettingsModal } from './components/SettingsModal';
@@ -9,7 +10,7 @@ import { Notification } from './components/Notification';
 import { refineCellContent, getCoreExperienceAlignmentSuggestions, generateColumnRequirements, translateToChinese, consolidateUIRequirementsForColumn, generateImage, generateTechImplementation } from './services/geminiService';
 import { exportToCSV, exportToMarkdown } from './services/exportService';
 import * as dbService from './services/dbService';
-import { GameTable, CoreExperienceRow, ApiKey, AIProvider, RequirementCategory, NotificationMessage, RequirementRow, GameEngine, RequirementCell, ReferenceImage, AssetSection, ArtConceptSegment } from './types';
+import { GameTable, CoreExperienceRow, ApiKey, AIProvider, RequirementCategory, NotificationMessage, RequirementRow, GameEngine, RequirementCell, ReferenceImage, AssetSection, ArtConceptSegment, ConceptBoardItem, ConceptPath } from './types';
 import { CATEGORY_STATIC_DETAILS } from './constants';
 import { useLanguage } from './contexts/LanguageContext';
 
@@ -69,6 +70,8 @@ const App: React.FC = () => {
     const [timelineDescriptions, setTimelineDescriptions] = useState<string[]>([]);
     const [artConcepts, setArtConcepts] = useState<ArtConceptSegment[]>([]);
     const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
+    const [conceptBoardItems, setConceptBoardItems] = useState<ConceptBoardItem[]>([]);
+    const [conceptPaths, setConceptPaths] = useState<ConceptPath[]>([]);
     const [aiSuggestions, setAiSuggestions] = useState<string>('');
     const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
     const [selectedProvider, setSelectedProvider] = useState<AIProvider>(AIProvider.GEMINI);
@@ -89,18 +92,22 @@ const App: React.FC = () => {
             coreExperience,
             timelineDescriptions,
             artConcepts,
+            conceptBoardItems,
+            conceptPaths,
             selectedEngine
         };
-    }, [timeline, gameTable, coreExperience, timelineDescriptions, artConcepts, selectedEngine]);
+    }, [timeline, gameTable, coreExperience, timelineDescriptions, artConcepts, conceptBoardItems, conceptPaths, selectedEngine]);
 
     const loadState = async (loadedData: any) => {
         if (!loadedData) return;
-        const { timeline, gameTable, coreExperience, timelineDescriptions, artConcepts, referenceImages, selectedEngine } = loadedData;
+        const { timeline, gameTable, coreExperience, timelineDescriptions, artConcepts, referenceImages, conceptBoardItems, conceptPaths, selectedEngine } = loadedData;
         if (timeline) setTimeline(timeline);
         if (gameTable) setGameTable(gameTable);
         if (coreExperience) setCoreExperience(coreExperience);
         if (timelineDescriptions) setTimelineDescriptions(timelineDescriptions);
         if (artConcepts) setArtConcepts(artConcepts);
+        if (conceptBoardItems) setConceptBoardItems(conceptBoardItems);
+        if (conceptPaths) setConceptPaths(conceptPaths);
         if (selectedEngine) setSelectedEngine(selectedEngine);
 
         if (referenceImages && Array.isArray(referenceImages)) {
@@ -182,7 +189,7 @@ const App: React.FC = () => {
             saveStateToLocalStorage();
         }, 2000);
         return () => clearTimeout(handler);
-    }, [timeline, gameTable, coreExperience, timelineDescriptions, artConcepts, selectedEngine, apiKeys, saveStateToLocalStorage]);
+    }, [timeline, gameTable, coreExperience, timelineDescriptions, artConcepts, conceptBoardItems, conceptPaths, selectedEngine, apiKeys, saveStateToLocalStorage]);
 
     const handleSaveToFile = async () => {
         try {
@@ -470,6 +477,40 @@ const App: React.FC = () => {
 
     const handleDeleteArtConcept = (id: string) => {
         setArtConcepts(prev => prev.filter(segment => segment.id !== id));
+    };
+
+    // --- Concept Board Handlers ---
+    const handleAddConceptBoardItem = (item: Omit<ConceptBoardItem, 'id'>) => {
+        setConceptBoardItems(prev => [...prev, { ...item, id: crypto.randomUUID() }]);
+    };
+
+    const handleUpdateConceptBoardItem = (updatedItem: ConceptBoardItem) => {
+        setConceptBoardItems(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+    };
+
+    const handleDeleteConceptBoardItem = (id: string) => {
+        setConceptBoardItems(prev => prev.filter(item => item.id !== id));
+        // Also remove any paths that include this item
+        setConceptPaths(prev => prev.map(path => {
+            const newTagIds = path.tagIds.filter(tagId => tagId !== id);
+            // If the path becomes too short, remove it. Otherwise, update it.
+            return newTagIds.length < 2 ? null : { ...path, tagIds: newTagIds };
+        }).filter((path): path is ConceptPath => path !== null));
+    };
+
+    const handleAddConceptPath = (path: Omit<ConceptPath, 'id'>) => {
+        setConceptPaths(prev => [...prev, { ...path, id: crypto.randomUUID() }]);
+        setNotification({ type: 'success', message: t.notifications.pathCreated });
+    };
+
+    const handleUpdateConceptPath = (updatedPath: ConceptPath) => {
+        setConceptPaths(prev => prev.map(path => path.id === updatedPath.id ? updatedPath : path));
+        setNotification({ type: 'info', message: t.notifications.pathUpdated });
+    };
+
+    const handleDeleteConceptPath = (id: string) => {
+        setConceptPaths(prev => prev.filter(path => path.id !== id));
+        setNotification({ type: 'info', message: t.notifications.pathDeleted });
     };
 
 
@@ -915,6 +956,16 @@ const App: React.FC = () => {
                         onSceneUploadClick={() => handleReferenceImageUploadClick(AssetSection.SCENE)}
                         onUpdateLabel={handleUpdateReferenceImageLabel}
                         onDelete={handleDeleteReferenceImage}
+                    />
+                    <GameConceptBoard
+                        items={conceptBoardItems}
+                        paths={conceptPaths}
+                        onAddItem={handleAddConceptBoardItem}
+                        onUpdateItem={handleUpdateConceptBoardItem}
+                        onDeleteItem={handleDeleteConceptBoardItem}
+                        onAddPath={handleAddConceptPath}
+                        onUpdatePath={handleUpdateConceptPath}
+                        onDeletePath={handleDeleteConceptPath}
                     />
                     <GameReqTable 
                         timeline={timeline}

@@ -73,3 +73,17 @@ export interface ArtConceptSegment {
   timelineRange: string; // User input like "2-4"
   description: string;
 }
+
+export interface ConceptBoardItem {
+  id: string;
+  text: string;
+  position: { x: number; y: number };
+  type: 'inspiration' | 'asset';
+  panel: 'inspiration' | 'refinement';
+}
+
+export interface ConceptPath {
+  id: string;
+  tagIds: string[];
+  description: string;
+}
