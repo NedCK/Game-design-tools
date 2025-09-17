@@ -38,7 +38,8 @@ const DraggableTag: React.FC<{
 }> = ({ item, isConnectingFrom, onStartConnection, isSelected, onClick, showConnectionDot }) => {
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-        e.dataTransfer.setData('aigamearchitect/json', JSON.stringify({ type: 'inspiration-tag', id: item.id }));
+        // Use a generic 'board-item' type for any item being dragged from within the board.
+        e.dataTransfer.setData('aigamearchitect/json', JSON.stringify({ type: 'board-item', id: item.id }));
         e.dataTransfer.effectAllowed = 'move';
     };
     
@@ -120,7 +121,10 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
     
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
-        e.dataTransfer.dropEffect = 'copy';
+        // By not setting dropEffect, we let the browser use the value
+        // from effectAllowed set in onDragStart. Forcing a single value
+        // like 'copy' created a conflict when dragging items with
+        // effectAllowed set to 'move', preventing them from being dropped.
     };
 
     const handleDrop = (e: React.DragEvent, panel: 'inspiration' | 'refinement') => {
@@ -136,7 +140,7 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
 
         try {
             const parsed = JSON.parse(data);
-            if (parsed.type === 'inspiration-tag') {
+            if (parsed.type === 'board-item') {
                 const originalItem = items.find(i => i.id === parsed.id);
                 if (originalItem) {
                     // If dragging from inspiration to refinement, COPY it.
@@ -144,7 +148,7 @@ export const GameConceptBoard: React.FC<GameConceptBoardProps> = ({ items, paths
                         onAddItem({
                             text: originalItem.text,
                             position,
-                            type: 'inspiration', // It's still an 'inspiration' type tag
+                            type: 'inspiration',
                             panel: 'refinement'
                         });
                     } else {
